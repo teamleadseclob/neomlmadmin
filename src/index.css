@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* Global dark theme contrast improvements */
+body {
+  background: #0a0f1e;
+  color: #e2e8f0;
+}
+
+/* Sidebar scrollbar */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 3px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+/* Table row striping for better readability */
+table tbody tr:nth-child(even) {
+  background: rgba(15, 21, 34, 0.4);
+}
+
+/* Login page input placeholder */
+.login-page input::placeholder {
+  color: #3d5a55;
+}
