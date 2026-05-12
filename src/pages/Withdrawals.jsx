@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
   FiSettings, FiBell, FiSearch, FiDownload, FiCalendar,
-  FiChevronDown, FiChevronLeft, FiChevronRight, FiArrowUpRight,
+  FiChevronDown, FiChevronLeft, FiChevronRight,
   FiFilter, FiPrinter, FiCheck, FiX
 } from 'react-icons/fi';
 import { BsFiletypePdf } from 'react-icons/bs';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { getWithdrawals, approveWithdrawal, rejectWithdrawal, bulkApproveWithdrawals } from '../api/withdrawals';
 
 const Withdrawals = () => {
@@ -18,6 +20,8 @@ const Withdrawals = () => {
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
 
+  const [summary, setSummary] = useState({});
+
   const fetchWithdrawals = async (page = 1) => {
     setLoading(true);
     try {
@@ -26,6 +30,7 @@ const Withdrawals = () => {
       const res = await getWithdrawals(params);
       setWithdrawalData(res.data.data || []);
       setPagination(res.data.pagination || { totalDocs: 0, totalPages: 1 });
+      if (res.data.summary) setSummary(res.data.summary);
     } catch (err) {
       console.error('Failed to fetch withdrawals:', err);
     } finally {
@@ -86,6 +91,40 @@ const Withdrawals = () => {
     }
   };
 
+  const handleExportPDF = async () => {
+    try {
+      const params = { page: 1, limit: pagination.totalDocs || 10000 };
+      if (statusFilter !== 'All Statuses') params.status = statusFilter.toLowerCase();
+      const res = await getWithdrawals(params);
+      const allData = res.data.data || [];
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text('Withdrawal History', 14, 20);
+      autoTable(doc, {
+        startY: 30,
+        head: [['#', 'User', 'User ID', 'Amount (USDT)', 'Wallet Address', 'Date', 'Status']],
+        body: allData.map((row, idx) => [
+          idx + 1,
+          row.userId?.name || '-',
+          row.userId?.userId || '-',
+          row.amount?.toLocaleString() || '0',
+          row.walletAddress || '-',
+          new Date(row.createdAt).toLocaleDateString(),
+          row.status,
+        ]),
+        columnStyles: {
+          0: { halign: 'center', cellWidth: 12 },
+        },
+        headStyles: {
+          halign: 'center',
+        },
+      });
+      doc.save('withdrawals.pdf');
+    } catch (err) {
+      console.error('Export PDF failed:', err);
+    }
+  };
+
   const getStatusStyle = (status) => {
     switch (status) {
       case 'completed': return 'text-[#00e396] bg-[#00e396]/10 border border-[#00e396]/30';
@@ -128,7 +167,10 @@ const Withdrawals = () => {
           />
         </div>
         <div className="flex items-center gap-3 shrink-0">
-          <button className="flex items-center gap-2 px-5 py-3 bg-[#0f1522] border border-[#1e293b] rounded-xl text-[13px] font-semibold text-gray-300 hover:bg-[#151c2b] transition-colors cursor-pointer">
+          <button
+            onClick={handleExportPDF}
+            className="flex items-center gap-2 px-5 py-3 bg-[#0f1522] border border-[#1e293b] rounded-xl text-[13px] font-semibold text-gray-300 hover:bg-[#151c2b] transition-colors cursor-pointer"
+          >
             Export data
             <FiDownload className="w-4 h-4" />
           </button>
@@ -140,39 +182,30 @@ const Withdrawals = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-
-        {/* Lifetime Paid */}
-        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 relative overflow-hidden">
-          <div className="absolute left-0 top-0 bottom-0 w-0.75 bg-linear-to-b from-[#00e396] to-[#0ea5e9]"></div>
-          <p className="text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-3 pl-1">Lifetime Paid</p>
-          <p className="text-[26px] font-extrabold text-white tracking-tight mb-2 pl-1">$14,290,551.42</p>
-          <p className="flex items-center text-[11px] font-bold text-[#00e396] pl-1">
-            <FiArrowUpRight className="mr-0.5 w-3.5 h-3.5" /> +12.5% this month
-          </p>
+        <div className="rounded-xl border border-[#737c7a]/40 bg-[#0a1018] p-5 shadow-[0_0_30px_rgba(109,119,116,0.35)]">
+          <p className="text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-3">Total Amount Approved</p>
+          <p className="text-[26px] font-extrabold text-white tracking-tight mb-2">${(summary.totalAmountApproved || 0).toLocaleString()}</p>
+          <p className="text-[11px] text-[#14CA74] font-medium">Today: ${summary.todayApproved || 0}</p>
         </div>
 
-        {/* Cancelled Total */}
-        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5">
-          <p className="text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-3">Cancelled Total</p>
-          <p className="text-[26px] font-extrabold text-white tracking-tight mb-2">$248,310.00</p>
-          <p className="text-[11px] text-gray-500 font-medium">1.7% of total volume</p>
+        <div className="rounded-xl border border-[#737c7a]/40 bg-[#0a1018] p-5 shadow-[0_0_30px_rgba(109,119,116,0.35)]">
+          <p className="text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-3">Total Amount Rejected</p>
+          <p className="text-[26px] font-extrabold text-white tracking-tight mb-2">${(summary.totalAmountRejected || 0).toLocaleString()}</p>
+          <p className="text-[11px] text-gray-500 font-medium">{summary.totalRejected || 0} rejected</p>
         </div>
 
-        {/* Historical Success Rate */}
-        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 border-t-2 border-t-[#00e396]">
-          <p className="text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-3">Historical Success Rate</p>
-          <p className="text-[26px] font-extrabold text-white tracking-tight mb-3">98.42%</p>
-          {/* Progress bar */}
-          <div className="w-full h-0.75 bg-[#1e293b] rounded-full overflow-hidden">
-            <div className="h-full bg-linear-to-r from-[#0ea5e9] to-[#00e396] rounded-full" style={{ width: '98.42%' }}></div>
+        <div className="rounded-xl border-2 border-[#14CA74]/40 bg-[#0a1018] p-5 shadow-[0_0_30px_rgba(109,119,116,0.35)]">
+          <p className="text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-3">Total Requests</p>
+          <p className="text-[26px] font-extrabold text-white tracking-tight mb-3">{(summary.totalRequests || 0).toLocaleString()}</p>
+          <div className="w-full h-[3px] bg-[#1e293b] rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-[#0ea5e9] to-[#14CA74] rounded-full" style={{ width: summary.totalRequests ? `${(summary.totalApproved / summary.totalRequests * 100).toFixed(0)}%` : '0%' }}></div>
           </div>
         </div>
 
-        {/* Avg. Processing Time */}
-        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5">
-          <p className="text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-3">Avg. Processing Time</p>
-          <p className="text-[26px] font-extrabold text-white tracking-tight mb-2">14.2 Min</p>
-          <p className="text-[11px] text-[#00e396] font-medium">Optimized: -2.4m today</p>
+        <div className="rounded-xl border border-[#737c7a]/40 bg-[#0a1018] p-5 shadow-[0_0_30px_rgba(109,119,116,0.35)]">
+          <p className="text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-3">Total Approved</p>
+          <p className="text-[26px] font-extrabold text-white tracking-tight mb-2">{(summary.totalApproved || 0).toLocaleString()}</p>
+          <p className="text-[11px] text-[#14CA74] font-medium">Pending: {summary.totalPending || 0}</p>
         </div>
       </div>
 
@@ -228,10 +261,7 @@ const Withdrawals = () => {
 
         {/* Actions */}
         <div className="flex items-end gap-3 self-end md:self-auto mt-2 md:mt-0">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[11px] font-bold text-gray-300 hover:bg-[#151c2b] hover:border-gray-600 transition-all cursor-pointer">
-            <BsFiletypePdf className="w-3.5 h-3.5 text-gray-400" />
-            Export PDF
-          </button>
+         
           <button className="flex items-center gap-2 px-4 py-2.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[11px] font-bold text-gray-300 hover:bg-[#151c2b] hover:border-gray-600 transition-all cursor-pointer">
             <FiFilter className="w-3.5 h-3.5 text-gray-400" />
             Reset Filters

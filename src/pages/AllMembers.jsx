@@ -1,17 +1,76 @@
 import { useState, useEffect } from "react"
 import { IoDownloadOutline, IoSettingsOutline, IoNotificationsOutline } from "react-icons/io5"
-import { FiSearch, FiRefreshCw } from "react-icons/fi"
+import { FiSearch, FiChevronLeft, FiChevronRight } from "react-icons/fi"
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 import {userlist, blockUser, unblockUser } from "../api/membersApi"
 
 const AllMembers = () => {
   const [members, setMembers] = useState([])
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalDocs, setTotalDocs] = useState(0)
+  const [search, setSearch] = useState("")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [showFilter, setShowFilter] = useState(false)
+  const limit = 10
+
+  const fetchMembers = () => {
+    const params = { page, limit }
+    if (search) params.search = search
+    if (statusFilter === "active") params.isBlocked = false
+    if (statusFilter === "blocked") params.isBlocked = true
+    userlist(params)
+      .then((res) => {
+        setMembers(res.data?.data || [])
+        const pg = res.data?.pagination
+        if (pg) {
+          setTotalPages(pg.totalPages)
+          setTotalDocs(pg.totalDocs)
+        }
+      })
+      .catch(console.error)
+  }
 
   useEffect(() => {
-    userlist()
-      .then((res) => setMembers(res.data?.data || []))
-      .catch(console.error)
-  }, [])
+    fetchMembers()
+  }, [page, search, statusFilter])
+
+  const handleExportPDF = async () => {
+    try {
+      const params = { page: 1, limit: totalDocs || 10000 }
+      if (search) params.search = search
+      if (statusFilter === "active") params.isBlocked = false
+      if (statusFilter === "blocked") params.isBlocked = true
+      const res = await userlist(params)
+      const allData = res.data?.data || []
+      const doc = new jsPDF("landscape")
+      doc.setFontSize(16)
+      doc.text("All Members", 14, 20)
+      autoTable(doc, {
+        startY: 30,
+        head: [["#", "User ID", "Name", "Email", "Sponsor ID", "Total Invested", "Gross Earnings", "Withdrawn", "Status"]],
+        body: allData.map((m, idx) => [
+          idx + 1,
+          m.userId || "-",
+          m.name || "-",
+          m.email || "-",
+          m.sponsorId || "-",
+          `$${m.totalInvested?.toLocaleString() || "0"}`,
+          `$${m.totalGrossEarnings?.toLocaleString() || "0"}`,
+          `$${m.withdrawnAmount?.toLocaleString() || "0"}`,
+          m.isBlocked ? "Blocked" : "Active",
+        ]),
+        columnStyles: {
+          0: { halign: "center", cellWidth: 12 },
+        },
+      })
+      doc.save("all-members.pdf")
+    } catch (err) {
+      console.error("Export PDF failed:", err)
+    }
+  }
 
   return (
     <div>
@@ -39,10 +98,15 @@ const AllMembers = () => {
             type="text"
             placeholder="Search members by ID, name or email..."
             className="bg-transparent text-[13px] text-white placeholder-[#475569] outline-none w-full"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
           />
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 rounded-xl border border-[#1e293b] text-[12px] sm:text-[13px] text-white hover:bg-[#111827] transition-colors cursor-pointer whitespace-nowrap">
+          <button
+            onClick={handleExportPDF}
+            className="flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 rounded-xl border border-[#1e293b] text-[12px] sm:text-[13px] text-white hover:bg-[#111827] transition-colors cursor-pointer whitespace-nowrap"
+          >
             Export data <IoDownloadOutline className="text-base" />
           </button>
         </div>
@@ -50,15 +114,35 @@ const AllMembers = () => {
 
       {/* Table Container */}
       <div className="rounded-xl border border-[#2d3a4f] bg-[#0d1321] shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
-        {/* Filters & Pagination */}
+        {/* Filters */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-4 border-b border-[#2d3a4f] gap-3">
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-            <button className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg border border-[#2d3a4f] text-[12px] sm:text-[13px] text-[#b0bec5] hover:bg-[#111827] transition-colors cursor-pointer">
+          <div className="relative">
+            <button
+              onClick={() => setShowFilter(!showFilter)}
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg border border-[#2d3a4f] text-[12px] sm:text-[13px] text-[#b0bec5] hover:bg-[#111827] transition-colors cursor-pointer"
+            >
               <HiOutlineAdjustmentsHorizontal className="text-base" /> Filter by Status <span className="text-[#64748b]">▾</span>
             </button>
+            {showFilter && (
+              <div className="absolute top-full left-0 mt-1 z-10 w-40 rounded-lg border border-[#2d3a4f] bg-[#0d1321] shadow-lg overflow-hidden">
+                {["all", "active", "blocked"].map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => { setStatusFilter(s); setPage(1); setShowFilter(false) }}
+                    className={`w-full text-left px-4 py-2.5 text-[12px] sm:text-[13px] cursor-pointer transition-colors ${
+                      statusFilter === s
+                        ? "bg-[#25c3a3]/15 text-[#25c3a3] font-semibold"
+                        : "text-[#b0bec5] hover:bg-[#111827]"
+                    }`}
+                  >
+                    {s.charAt(0).toUpperCase() + s.slice(1)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <span className="text-[12px] sm:text-[13px] text-[#94a3b8]">
-            Total: <span className="text-white font-semibold">{members.length}</span> members
+            Total: <span className="text-white font-semibold">{totalDocs}</span> members
           </span>
         </div>
 
@@ -116,12 +200,40 @@ const AllMembers = () => {
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-t border-[#2d3a4f]/60">
-          <p className="text-[11px] sm:text-[12px] text-[#25c3a3] italic">Data updated in real-time.</p>
-          <button className="p-2 rounded-lg text-[#64748b] hover:text-white hover:bg-[#111827] transition-colors cursor-pointer">
-            <FiRefreshCw className="text-lg" />
-          </button>
+        {/* Footer / Pagination */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-4 gap-3 border-t border-[#2d3a4f]/60">
+          <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.1em] text-[#94a3b8] uppercase">
+            Showing {((page - 1) * limit) + 1}-{Math.min(page * limit, totalDocs)} of {totalDocs.toLocaleString()} entries
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-[#1e293b] flex items-center justify-center text-[#64748b] hover:bg-[#111827] cursor-pointer transition-colors disabled:opacity-40"
+            >
+              <FiChevronLeft className="text-sm" />
+            </button>
+            {Array.from({ length: Math.min(totalPages, 3) }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                onClick={() => setPage(n)}
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-[11px] sm:text-[12px] font-semibold flex items-center justify-center cursor-pointer transition-colors ${
+                  n === page
+                    ? "bg-[#25c3a3] text-white"
+                    : "border border-[#1e293b] text-[#64748b] hover:bg-[#111827]"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+            <button
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-[#1e293b] flex items-center justify-center text-[#64748b] hover:bg-[#111827] cursor-pointer transition-colors disabled:opacity-40"
+            >
+              <FiChevronRight className="text-sm" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

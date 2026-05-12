@@ -3,6 +3,7 @@ import { swplist, swpUpdate, mlrlist, mlrUpdate } from "../api/package"
 import { FiEdit2, FiCheck, FiX } from "react-icons/fi"
 
 const Packages = () => {
+  const [activeTab, setActiveTab] = useState("SWP")
   const [swpData, setSwpData] = useState([])
   const [mlrData, setMlrData] = useState([])
   const [swpEditing, setSwpEditing] = useState(null)
@@ -17,200 +18,184 @@ const Packages = () => {
 
   useEffect(() => { fetchData() }, [])
 
-  // SWP edit handlers
-  const startSwpEdit = (item) => {
-    setSwpEditing(item.level)
-    setSwpForm({ percentage: item.percentage })
-  }
+  const startSwpEdit = (item) => { setSwpEditing(item.level); setSwpForm({ percentage: item.percentage }) }
   const cancelSwpEdit = () => setSwpEditing(null)
   const saveSwpEdit = async (level) => {
-    try {
-      await swpUpdate(level, { percentage: Number(swpForm.percentage) })
-      setSwpEditing(null)
-      fetchData()
-    } catch (err) { console.error(err) }
+    try { await swpUpdate(level, { percentage: Number(swpForm.percentage) }); setSwpEditing(null); fetchData() } catch (err) { console.error(err) }
   }
 
-  // MLR edit handlers
-  const startMlrEdit = (item) => {
-    setMlrEditing(item.level)
-    setMlrForm({ percentage: item.percentage, requiredRankOrder: item.requiredRankOrder })
-  }
+  const startMlrEdit = (item) => { setMlrEditing(item.level); setMlrForm({ percentage: item.percentage, requiredRankOrder: item.requiredRankOrder }) }
   const cancelMlrEdit = () => setMlrEditing(null)
   const saveMlrEdit = async (level) => {
-    try {
-      await mlrUpdate(level, {
-        percentage: Number(mlrForm.percentage),
-        requiredRankOrder: Number(mlrForm.requiredRankOrder),
-      })
-      setMlrEditing(null)
-      fetchData()
-    } catch (err) { console.error(err) }
+    try { await mlrUpdate(level, { percentage: Number(mlrForm.percentage), requiredRankOrder: Number(mlrForm.requiredRankOrder) }); setMlrEditing(null); fetchData() } catch (err) { console.error(err) }
   }
 
   return (
     <div>
-      <div className="mb-8 sm:mb-10">
+      {/* Header */}
+      <div className="mb-8">
         <h1 className="text-[26px] sm:text-[32px] font-extrabold text-white tracking-tight">Packages</h1>
         <p className="text-[13px] sm:text-[14px] text-[#64748b] mt-1">View SWP level commissions and MLR reward configurations.</p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        {/* ═══════════ SWP Table ═══════════ */}
-        <div className="rounded-2xl border border-[#1e293b] bg-[#0b1120] shadow-[0_0_40px_rgba(37,195,163,0.04)] overflow-hidden">
-          <div className="px-6 sm:px-8 py-5 sm:py-6 border-b border-[#1e293b] bg-gradient-to-r from-[#0d1321] to-[#0f1729]">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#25c3a3]/15 flex items-center justify-center">
-                <span className="text-[18px] font-black text-[#25c3a3]">S</span>
-              </div>
-              <div>
-                <h2 className="text-[18px] sm:text-[20px] font-extrabold text-white tracking-tight">SWP — Level Commissions</h2>
-                <p className="text-[12px] text-[#64748b] mt-0.5">
-                  <span className="text-white font-bold">{swpData.length}</span> active levels configured
-                </p>
-              </div>
-            </div>
+      {/* Tab Selector + Info */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="inline-flex items-center p-1 rounded-xl bg-[#0b1120] border border-[#1e293b]">
+          <button
+            onClick={() => setActiveTab("SWP")}
+            className={`px-5 py-2.5 rounded-lg text-[13px] sm:text-[14px] font-bold transition-all duration-200 cursor-pointer ${
+              activeTab === "SWP"
+                ? "bg-[#25c3a3]/15 text-[#25c3a3] shadow-[0_0_12px_rgba(37,195,163,0.15)]"
+                : "text-[#64748b] hover:text-white"
+            }`}
+          >
+            SWP — Level Commissions
+          </button>
+          <button
+            onClick={() => setActiveTab("MLR")}
+            className={`px-5 py-2.5 rounded-lg text-[13px] sm:text-[14px] font-bold transition-all duration-200 cursor-pointer ${
+              activeTab === "MLR"
+                ? "bg-[#0ea5e9]/15 text-[#0ea5e9] shadow-[0_0_12px_rgba(14,165,233,0.15)]"
+                : "text-[#64748b] hover:text-white"
+            }`}
+          >
+            MLR — Multi-Level Rewards
+          </button>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${activeTab === "SWP" ? "bg-[#25c3a3]/10 border border-[#25c3a3]/20" : "bg-[#0ea5e9]/10 border border-[#0ea5e9]/20"}`}>
+            <span className={`text-[15px] font-black ${activeTab === "SWP" ? "text-[#25c3a3]" : "text-[#0ea5e9]"}`}>
+              {activeTab === "SWP" ? "S" : "M"}
+            </span>
           </div>
+          <p className="text-[13px] text-[#94a3b8]">
+            <span className="text-white font-bold">{activeTab === "SWP" ? swpData.length : mlrData.length}</span> active levels configured
+          </p>
+        </div>
+      </div>
 
-          <div className="grid grid-cols-[1fr_1fr_0.5fr] gap-4 px-6 sm:px-8 py-4 text-[11px] sm:text-[12px] font-extrabold tracking-[0.15em] text-[#64748b] uppercase border-b border-[#1e293b] bg-[#080d1a]">
-            <span>Level</span>
-            <span>Percentage</span>
-            <span className="text-center">Action</span>
-          </div>
-
-          {swpData.map((item, i) => (
+      {/* Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        {activeTab === "SWP" &&
+          swpData.map((item) => (
             <div
               key={item._id}
-              className={`grid grid-cols-[1fr_1fr_0.5fr] gap-4 px-6 sm:px-8 py-4 sm:py-5 items-center border-b border-[#1e293b]/40 hover:bg-[#25c3a3]/5 transition-all duration-200 ${i % 2 === 0 ? "bg-[#0b1120]" : "bg-[#0d1424]"}`}
+              className="group rounded-2xl border border-[#1e293b] bg-gradient-to-b from-[#0d1424] to-[#0b1120] p-5 hover:border-[#25c3a3]/30 hover:shadow-[0_0_24px_rgba(37,195,163,0.06)] transition-all duration-300"
             >
-              <div className="flex items-center gap-3">
-                <span className="w-9 h-9 rounded-lg bg-[#25c3a3]/10 border border-[#25c3a3]/20 flex items-center justify-center text-[14px] font-black text-[#25c3a3]">
-                  {item.level}
-                </span>
-                <span className="text-[13px] text-[#94a3b8] font-medium">Level {item.level}</span>
+              {/* Card Header */}
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <span className="w-11 h-11 rounded-xl bg-[#25c3a3]/10 border border-[#25c3a3]/20 flex items-center justify-center text-[16px] font-black text-[#25c3a3]">
+                    {item.level}
+                  </span>
+                  <div>
+                    <p className="text-[14px] font-bold text-white">Level {item.level}</p>
+                    <p className="text-[11px] text-[#64748b]">Commission</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {swpEditing === item.level ? (
+                    <>
+                      <button onClick={() => saveSwpEdit(item.level)} className="w-8 h-8 rounded-lg bg-[#25c3a3]/15 border border-[#25c3a3]/30 flex items-center justify-center text-[#25c3a3] hover:bg-[#25c3a3]/25 cursor-pointer transition-colors">
+                        <FiCheck className="text-[15px]" />
+                      </button>
+                      <button onClick={cancelSwpEdit} className="w-8 h-8 rounded-lg bg-[#ef4444]/15 border border-[#ef4444]/30 flex items-center justify-center text-[#ef4444] hover:bg-[#ef4444]/25 cursor-pointer transition-colors">
+                        <FiX className="text-[15px]" />
+                      </button>
+                    </>
+                  ) : (
+                    <button onClick={() => startSwpEdit(item)} className="w-8 h-8 rounded-lg bg-[#25c3a3]/10 border border-[#25c3a3]/20 flex items-center justify-center text-[#25c3a3] hover:bg-[#25c3a3]/20 cursor-pointer sm:opacity-0 sm:group-hover:opacity-100 transition-all">
+                      <FiEdit2 className="text-[13px]" />
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {swpEditing === item.level ? (
-                <input
-                  type="number"
-                  value={swpForm.percentage}
-                  onChange={(e) => setSwpForm({ percentage: e.target.value })}
-                  className="w-20 px-3 py-1.5 rounded-lg bg-[#0a0f1e] border border-[#25c3a3]/40 text-[14px] font-bold text-white outline-none focus:border-[#25c3a3]"
-                />
-              ) : (
-                <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-[#25c3a3]/10 border border-[#25c3a3]/20 text-[14px] sm:text-[15px] font-extrabold text-[#25c3a3] w-fit">
-                  {item.percentage}%
-                </span>
-              )}
-
-              <div className="flex items-center justify-center gap-2">
+              {/* Card Body */}
+              <div className="pt-4 border-t border-[#1e293b]/60">
+                <p className="text-[11px] text-[#64748b] uppercase tracking-wider font-semibold mb-2">Percentage</p>
                 {swpEditing === item.level ? (
-                  <>
-                    <button onClick={() => saveSwpEdit(item.level)} className="w-8 h-8 rounded-lg bg-[#25c3a3]/15 border border-[#25c3a3]/30 flex items-center justify-center text-[#25c3a3] hover:bg-[#25c3a3]/25 transition-colors cursor-pointer">
-                      <FiCheck className="text-[16px]" />
-                    </button>
-                    <button onClick={cancelSwpEdit} className="w-8 h-8 rounded-lg bg-[#ef4444]/15 border border-[#ef4444]/30 flex items-center justify-center text-[#ef4444] hover:bg-[#ef4444]/25 transition-colors cursor-pointer">
-                      <FiX className="text-[16px]" />
-                    </button>
-                  </>
+                  <input
+                    type="number"
+                    value={swpForm.percentage}
+                    onChange={(e) => setSwpForm({ percentage: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg bg-[#080d1a] border border-[#25c3a3]/40 text-[20px] font-extrabold text-white outline-none focus:border-[#25c3a3] transition-colors"
+                  />
                 ) : (
-                  <button onClick={() => startSwpEdit(item)} className="w-8 h-8 rounded-lg bg-[#25c3a3]/10 border border-[#25c3a3]/20 flex items-center justify-center text-[#25c3a3] hover:bg-[#25c3a3]/20 transition-colors cursor-pointer">
-                    <FiEdit2 className="text-[14px]" />
-                  </button>
+                  <p className="text-[28px] font-extrabold text-[#25c3a3] leading-none">{item.percentage}<span className="text-[18px] ml-0.5">%</span></p>
                 )}
               </div>
             </div>
           ))}
 
-          <div className="px-6 sm:px-8 py-4 bg-[#080d1a]">
-            <p className="text-[11px] text-[#25c3a3]/60 italic font-medium">Data synced from server</p>
-          </div>
-        </div>
-
-        {/* ═══════════ MLR Table ═══════════ */}
-        <div className="rounded-2xl border border-[#1e293b] bg-[#0b1120] shadow-[0_0_40px_rgba(14,165,233,0.04)] overflow-hidden">
-          <div className="px-6 sm:px-8 py-5 sm:py-6 border-b border-[#1e293b] bg-gradient-to-r from-[#0d1321] to-[#0f1729]">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#0ea5e9]/15 flex items-center justify-center">
-                <span className="text-[18px] font-black text-[#0ea5e9]">M</span>
-              </div>
-              <div>
-                <h2 className="text-[18px] sm:text-[20px] font-extrabold text-white tracking-tight">MLR — Multi-Level Rewards</h2>
-                <p className="text-[12px] text-[#64748b] mt-0.5">
-                  <span className="text-white font-bold">{mlrData.length}</span> active levels configured
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-[1fr_1fr_1fr_0.5fr] gap-4 px-6 sm:px-8 py-4 text-[11px] sm:text-[12px] font-extrabold tracking-[0.15em] text-[#64748b] uppercase border-b border-[#1e293b] bg-[#080d1a]">
-            <span>Level</span>
-            <span>Percentage</span>
-            <span>Required Rank</span>
-            <span className="text-center">Action</span>
-          </div>
-
-          {mlrData.map((item, i) => (
+        {activeTab === "MLR" &&
+          mlrData.map((item) => (
             <div
               key={item._id}
-              className={`grid grid-cols-[1fr_1fr_1fr_0.5fr] gap-4 px-6 sm:px-8 py-4 sm:py-5 items-center border-b border-[#1e293b]/40 hover:bg-[#0ea5e9]/5 transition-all duration-200 ${i % 2 === 0 ? "bg-[#0b1120]" : "bg-[#0d1424]"}`}
+              className="group rounded-2xl border border-[#1e293b] bg-gradient-to-b from-[#0d1424] to-[#0b1120] p-5 hover:border-[#0ea5e9]/30 hover:shadow-[0_0_24px_rgba(14,165,233,0.06)] transition-all duration-300"
             >
-              <div className="flex items-center gap-3">
-                <span className="w-9 h-9 rounded-lg bg-[#0ea5e9]/10 border border-[#0ea5e9]/20 flex items-center justify-center text-[14px] font-black text-[#0ea5e9]">
-                  {item.level}
-                </span>
-                <span className="text-[13px] text-[#94a3b8] font-medium">Level {item.level}</span>
+              {/* Card Header */}
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <span className="w-11 h-11 rounded-xl bg-[#0ea5e9]/10 border border-[#0ea5e9]/20 flex items-center justify-center text-[16px] font-black text-[#0ea5e9]">
+                    {item.level}
+                  </span>
+                  <div>
+                    <p className="text-[14px] font-bold text-white">Level {item.level}</p>
+                    <p className="text-[11px] text-[#64748b]">Reward</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {mlrEditing === item.level ? (
+                    <>
+                      <button onClick={() => saveMlrEdit(item.level)} className="w-8 h-8 rounded-lg bg-[#25c3a3]/15 border border-[#25c3a3]/30 flex items-center justify-center text-[#25c3a3] hover:bg-[#25c3a3]/25 cursor-pointer transition-colors">
+                        <FiCheck className="text-[15px]" />
+                      </button>
+                      <button onClick={cancelMlrEdit} className="w-8 h-8 rounded-lg bg-[#ef4444]/15 border border-[#ef4444]/30 flex items-center justify-center text-[#ef4444] hover:bg-[#ef4444]/25 cursor-pointer transition-colors">
+                        <FiX className="text-[15px]" />
+                      </button>
+                    </>
+                  ) : (
+                    <button onClick={() => startMlrEdit(item)} className="w-8 h-8 rounded-lg bg-[#0ea5e9]/10 border border-[#0ea5e9]/20 flex items-center justify-center text-[#0ea5e9] hover:bg-[#0ea5e9]/20 cursor-pointer sm:opacity-0 sm:group-hover:opacity-100 transition-all">
+                      <FiEdit2 className="text-[13px]" />
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {mlrEditing === item.level ? (
-                <input
-                  type="number"
-                  value={mlrForm.percentage}
-                  onChange={(e) => setMlrForm({ ...mlrForm, percentage: e.target.value })}
-                  className="w-20 px-3 py-1.5 rounded-lg bg-[#0a0f1e] border border-[#0ea5e9]/40 text-[14px] font-bold text-white outline-none focus:border-[#0ea5e9]"
-                />
-              ) : (
-                <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-[#0ea5e9]/10 border border-[#0ea5e9]/20 text-[14px] sm:text-[15px] font-extrabold text-[#0ea5e9] w-fit">
-                  {item.percentage}%
-                </span>
-              )}
-
-              {mlrEditing === item.level ? (
-                <input
-                  type="number"
-                  value={mlrForm.requiredRankOrder}
-                  onChange={(e) => setMlrForm({ ...mlrForm, requiredRankOrder: e.target.value })}
-                  className="w-20 px-3 py-1.5 rounded-lg bg-[#0a0f1e] border border-[#f59e0b]/40 text-[14px] font-bold text-white outline-none focus:border-[#f59e0b]"
-                />
-              ) : (
-                <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-[#f59e0b]/10 border border-[#f59e0b]/20 text-[13px] sm:text-[14px] font-bold text-[#f59e0b] w-fit">
-                  Rank {item.requiredRankOrder}
-                </span>
-              )}
-
-              <div className="flex items-center justify-center gap-2">
-                {mlrEditing === item.level ? (
-                  <>
-                    <button onClick={() => saveMlrEdit(item.level)} className="w-8 h-8 rounded-lg bg-[#25c3a3]/15 border border-[#25c3a3]/30 flex items-center justify-center text-[#25c3a3] hover:bg-[#25c3a3]/25 transition-colors cursor-pointer">
-                      <FiCheck className="text-[16px]" />
-                    </button>
-                    <button onClick={cancelMlrEdit} className="w-8 h-8 rounded-lg bg-[#ef4444]/15 border border-[#ef4444]/30 flex items-center justify-center text-[#ef4444] hover:bg-[#ef4444]/25 transition-colors cursor-pointer">
-                      <FiX className="text-[16px]" />
-                    </button>
-                  </>
-                ) : (
-                  <button onClick={() => startMlrEdit(item)} className="w-8 h-8 rounded-lg bg-[#0ea5e9]/10 border border-[#0ea5e9]/20 flex items-center justify-center text-[#0ea5e9] hover:bg-[#0ea5e9]/20 transition-colors cursor-pointer">
-                    <FiEdit2 className="text-[14px]" />
-                  </button>
-                )}
+              {/* Card Body */}
+              <div className="pt-4 border-t border-[#1e293b]/60 space-y-4">
+                <div>
+                  <p className="text-[11px] text-[#64748b] uppercase tracking-wider font-semibold mb-2">Percentage</p>
+                  {mlrEditing === item.level ? (
+                    <input
+                      type="number"
+                      value={mlrForm.percentage}
+                      onChange={(e) => setMlrForm({ ...mlrForm, percentage: e.target.value })}
+                      className="w-full px-3 py-2 rounded-lg bg-[#080d1a] border border-[#0ea5e9]/40 text-[20px] font-extrabold text-white outline-none focus:border-[#0ea5e9] transition-colors"
+                    />
+                  ) : (
+                    <p className="text-[28px] font-extrabold text-[#0ea5e9] leading-none">{item.percentage}<span className="text-[18px] ml-0.5">%</span></p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-[11px] text-[#64748b] uppercase tracking-wider font-semibold mb-2">Required Rank</p>
+                  {mlrEditing === item.level ? (
+                    <input
+                      type="number"
+                      value={mlrForm.requiredRankOrder}
+                      onChange={(e) => setMlrForm({ ...mlrForm, requiredRankOrder: e.target.value })}
+                      className="w-full px-3 py-2 rounded-lg bg-[#080d1a] border border-[#f59e0b]/40 text-[16px] font-bold text-white outline-none focus:border-[#f59e0b] transition-colors"
+                    />
+                  ) : (
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-[#f59e0b]/10 border border-[#f59e0b]/20 text-[14px] font-bold text-[#f59e0b]">
+                      Rank {item.requiredRankOrder}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           ))}
-
-          <div className="px-6 sm:px-8 py-4 bg-[#080d1a]">
-            <p className="text-[11px] text-[#0ea5e9]/60 italic font-medium">Data synced from server</p>
-          </div>
-        </div>
       </div>
     </div>
   )

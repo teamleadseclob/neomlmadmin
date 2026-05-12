@@ -12,3 +12,7 @@ export const updateRoiDistributionData = async (data) => {
 export const distributeRoi = async () => {
   return axiosInstance.post("/api/admin/roi/distribute");
 }
+
+export const getDistributionHistory = async (params = {}) => {
+  return axiosInstance.get("/api/admin/roi/distributions", { params });
+}

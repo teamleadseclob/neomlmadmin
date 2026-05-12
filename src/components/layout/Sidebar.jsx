@@ -9,6 +9,7 @@ import transactionsIcon from "../../assets/icons/sidebar/transactions.png"
 import withdrawalsIcon from "../../assets/icons/sidebar/widrawals.png"
 import distributionIcon from "../../assets/icons/sidebar/generalreport.png"
 import ticketsIcon from "../../assets/icons/sidebar/tickets.png"
+import reports from "../../assets/icons/sidebar/reports.png"
 import subscribersIcon from "../../assets/icons/sidebar/subscribers.png"
 import settingsIcon from "../../assets/icons/sidebar/settings.png"
 import logoutIcon from "../../assets/icons/sidebar/logout.png"
@@ -21,7 +22,7 @@ const menuItems = [
     icon: membersIcon,
     children: [
       { name: "All Members", path: "/members" },
-      { name: "Announcements", path: "/members/announcements" },
+      // { name: "Announcements", path: "/members/announcements" },
       { name: "Blocked Members", path: "/members/blocked" },
     ],
   },
@@ -31,7 +32,8 @@ const menuItems = [
   { name: "Services", path: "/services", icon: packagesIcon },
   { name: "Distribution", path: "/distribution", icon: distributionIcon },
   { name: "Tickets", path: "/tickets", icon: ticketsIcon },
-  { name: "Subscribers", path: "/subscribers", icon: subscribersIcon },
+  { name: "Reports", path: "/reports", icon: reports },
+  // { name: "Subscribers", path: "/subscribers", icon: subscribersIcon },
   { name: "Settings", path: "/settings", icon: settingsIcon },
 ]
 
@@ -57,7 +59,7 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
         <div className="flex items-center gap-3">
           <img src={logoIcon} alt="FinanceFlow" className="w-9 h-9" />
           <div>
-            <h1 className="text-white text-[13px] font-bold leading-tight">FinanceFlow</h1>
+            <h1 className="text-white text-[13px] font-bold leading-tight">NEOFI ACADAMY</h1>
             <p className="text-[9px] text-[#25c3a3] uppercase tracking-[0.18em] mt-0.5 font-medium">Network Admin</p>
           </div>
         </div>

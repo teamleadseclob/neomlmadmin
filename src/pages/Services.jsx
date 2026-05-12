@@ -3,6 +3,7 @@ import {
   FiSettings, FiBell, FiUploadCloud, FiCalendar,
   FiChevronDown, FiAward, FiBook, FiTool
 } from 'react-icons/fi';
+import { createEvent } from '../api/services';
 
 const Services = () => {
   const [activeTab, setActiveTab] = useState('Contest');
@@ -15,8 +16,6 @@ const Services = () => {
     campaignTitle: 'Quantum Observatory Cup',
     subTitle: 'Quantum Observatory Cup',
     description: '',
-    prizePool: '500,000',
-    displayFormat: 'Panoramic Hero Banner',
     startDate: '',
     endDate: '',
   });
@@ -175,39 +174,7 @@ const Services = () => {
             />
           </div>
 
-          {/* Prize Pool & Display Format — side by side */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
-                Prize Pool (USD)
-              </label>
-              <input
-                type="text"
-                value={contestForm.prizePool}
-                onChange={(e) => handleContestChange('prizePool', e.target.value)}
-                className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors"
-                placeholder="Enter prize pool"
-              />
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
-                Display Format
-              </label>
-              <div className="relative">
-                <select
-                  value={contestForm.displayFormat}
-                  onChange={(e) => handleContestChange('displayFormat', e.target.value)}
-                  className="appearance-none w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white focus:outline-none focus:border-[#25c3a3]/50 transition-colors cursor-pointer"
-                >
-                  <option>Panoramic Hero Banner</option>
-                  <option>Card Grid Layout</option>
-                  <option>Compact List View</option>
-                  <option>Full Screen Overlay</option>
-                </select>
-                <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-              </div>
-            </div>
-          </div>
+
 
           {/* Background Image Upload */}
           <div className="mb-6">
@@ -285,7 +252,26 @@ const Services = () => {
             <button className="px-6 py-3 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] font-semibold text-gray-300 hover:bg-[#151c2b] hover:border-gray-600 transition-all cursor-pointer">
               Save Draft
             </button>
-            <button className="px-6 py-3 bg-[#ef4444] hover:bg-[#dc2626] rounded-lg text-[13px] font-bold text-white transition-colors cursor-pointer shadow-[0_0_16px_rgba(239,68,68,0.2)]">
+            <button
+              onClick={async () => {
+                const payload = {
+                  title: contestForm.campaignTitle,
+                  description: contestForm.description,
+                  type: 'contest',
+                  mediaUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
+                  expiryDays: contestForm.startDate && contestForm.endDate
+                    ? Math.ceil((new Date(contestForm.endDate) - new Date(contestForm.startDate)) / 86400000)
+                    : 30,
+                };
+                try {
+                  await createEvent(payload);
+                  alert('Campaign deployed successfully!');
+                } catch (err) {
+                  alert('Failed to deploy campaign');
+                }
+              }}
+              className="px-6 py-3 bg-[#ef4444] hover:bg-[#dc2626] rounded-lg text-[13px] font-bold text-white transition-colors cursor-pointer shadow-[0_0_16px_rgba(239,68,68,0.2)]"
+            >
               Deploy Campaign
             </button>
           </div>
@@ -350,6 +336,45 @@ const Services = () => {
             />
           </div>
 
+          {/* Background Image Upload */}
+          <div className="mb-6">
+            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              Background Image Upload
+            </label>
+            <div
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              className={`w-full py-10 bg-[#0a0f1e] border-2 border-dashed rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer ${
+                dragOver
+                  ? 'border-[#25c3a3] bg-[#25c3a3]/5'
+                  : 'border-[#1e293b] hover:border-gray-600'
+              }`}
+              onClick={handleBrowseClick}
+            >
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+              />
+              <FiUploadCloud className="w-8 h-8 text-gray-500 mb-3" />
+              {uploadedFile ? (
+                <p className="text-[13px] text-[#25c3a3] font-medium">{uploadedFile.name}</p>
+              ) : (
+                <>
+                  <p className="text-[13px] text-gray-400">
+                    Drag and drop assets here, or <span className="text-[#25c3a3] font-semibold hover:underline">browse files</span>
+                  </p>
+                  <p className="text-[10px] text-gray-500 mt-1.5 tracking-wide uppercase">
+                    Recommended: 1920x800 PNG/WEBP
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+
           {/* Price & Duration */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
@@ -402,7 +427,28 @@ const Services = () => {
             <button className="px-6 py-3 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] font-semibold text-gray-300 hover:bg-[#151c2b] hover:border-gray-600 transition-all cursor-pointer">
               Save Draft
             </button>
-            <button className="px-6 py-3 bg-[#25c3a3] hover:bg-[#1fae91] rounded-lg text-[13px] font-bold text-white transition-colors cursor-pointer shadow-[0_0_16px_rgba(37,195,163,0.2)]">
+            <button
+              onClick={async () => {
+                const payload = {
+                  title: learningForm.packageName,
+                  description: learningForm.description,
+                  type: 'learning_package',
+                  mediaUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
+                  expiryDays: parseInt(learningForm.duration) || 30,
+                  category: learningForm.category,
+                  price: learningForm.price,
+                  duration: learningForm.duration,
+                  accessLevel: learningForm.accessLevel,
+                };
+                try {
+                  await createEvent(payload);
+                  alert('Package published successfully!');
+                } catch (err) {
+                  alert('Failed to publish package');
+                }
+              }}
+              className="px-6 py-3 bg-[#25c3a3] hover:bg-[#1fae91] rounded-lg text-[13px] font-bold text-white transition-colors cursor-pointer shadow-[0_0_16px_rgba(37,195,163,0.2)]"
+            >
               Publish Package
             </button>
           </div>
@@ -467,6 +513,45 @@ const Services = () => {
             />
           </div>
 
+          {/* Background Image Upload */}
+          <div className="mb-6">
+            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              Background Image Upload
+            </label>
+            <div
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              className={`w-full py-10 bg-[#0a0f1e] border-2 border-dashed rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer ${
+                dragOver
+                  ? 'border-[#25c3a3] bg-[#25c3a3]/5'
+                  : 'border-[#1e293b] hover:border-gray-600'
+              }`}
+              onClick={handleBrowseClick}
+            >
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+              />
+              <FiUploadCloud className="w-8 h-8 text-gray-500 mb-3" />
+              {uploadedFile ? (
+                <p className="text-[13px] text-[#25c3a3] font-medium">{uploadedFile.name}</p>
+              ) : (
+                <>
+                  <p className="text-[13px] text-gray-400">
+                    Drag and drop assets here, or <span className="text-[#25c3a3] font-semibold hover:underline">browse files</span>
+                  </p>
+                  <p className="text-[10px] text-gray-500 mt-1.5 tracking-wide uppercase">
+                    Recommended: 1920x800 PNG/WEBP
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+
           {/* Access Level & Status */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
@@ -510,7 +595,27 @@ const Services = () => {
             <button className="px-6 py-3 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] font-semibold text-gray-300 hover:bg-[#151c2b] hover:border-gray-600 transition-all cursor-pointer">
               Save Draft
             </button>
-            <button className="px-6 py-3 bg-[#25c3a3] hover:bg-[#1fae91] rounded-lg text-[13px] font-bold text-white transition-colors cursor-pointer shadow-[0_0_16px_rgba(37,195,163,0.2)]">
+            <button
+              onClick={async () => {
+                const payload = {
+                  title: toolsForm.toolName,
+                  description: toolsForm.description,
+                  type: 'tools',
+                  mediaUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
+                  expiryDays: 30,
+                  toolType: toolsForm.toolType,
+                  accessLevel: toolsForm.accessLevel,
+                  status: toolsForm.status,
+                };
+                try {
+                  await createEvent(payload);
+                  alert('Tool deployed successfully!');
+                } catch (err) {
+                  alert('Failed to deploy tool');
+                }
+              }}
+              className="px-6 py-3 bg-[#25c3a3] hover:bg-[#1fae91] rounded-lg text-[13px] font-bold text-white transition-colors cursor-pointer shadow-[0_0_16px_rgba(37,195,163,0.2)]"
+            >
               Deploy Tool
             </button>
           </div>

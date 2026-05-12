@@ -3,6 +3,8 @@ import { IoSettingsOutline, IoNotificationsOutline, IoDownloadOutline } from "re
 import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiChevronDown } from "react-icons/fi"
 import { HiOutlineArrowTrendingUp, HiOutlineArrowTrendingDown } from "react-icons/hi2"
 import { GoShieldCheck } from "react-icons/go"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 import { getTransactions } from "../api/membersApi"
 
 const txTypeLabels = {
@@ -70,6 +72,37 @@ const Transactions = () => {
     setShowTypeDropdown(false)
   }
 
+  const handleExportPDF = async () => {
+    try {
+      const params = { page: 1, limit: pagination.totalDocs || 10000 }
+      if (typeFilter) params.type = typeFilter
+      if (search) params.search = search
+      const res = await getTransactions(params)
+      const allData = res.data.data || []
+      const doc = new jsPDF()
+      doc.setFontSize(16)
+      doc.text("Transactions", 14, 20)
+      autoTable(doc, {
+        startY: 30,
+        head: [["#", "Date/Time", "User", "User ID", "Type", "Amount"]],
+        body: allData.map((tx, idx) => [
+          idx + 1,
+          formatDate(tx.txDate),
+          tx.userId?.name || "-",
+          tx.userId?.userId || "-",
+          txTypeLabels[tx.txType] || tx.txType,
+          tx.txAmount?.toLocaleString() || "0",
+        ]),
+        columnStyles: {
+          0: { halign: "center", cellWidth: 12 },
+        },
+      })
+      doc.save("transactions.pdf")
+    } catch (err) {
+      console.error("Export PDF failed:", err)
+    }
+  }
+
   const formatDate = (dateStr) => {
     const d = new Date(dateStr)
     return d.toLocaleString("en-US", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })
@@ -124,7 +157,10 @@ const Transactions = () => {
           />
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center justify-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl border border-[#1e293b] text-[12px] sm:text-[13px] text-white hover:bg-[#111827] transition-colors cursor-pointer whitespace-nowrap">
+          <button
+            onClick={handleExportPDF}
+            className="flex items-center justify-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl border border-[#1e293b] text-[12px] sm:text-[13px] text-white hover:bg-[#111827] transition-colors cursor-pointer whitespace-nowrap"
+          >
             Export data <IoDownloadOutline className="text-base" />
           </button>
         </div>

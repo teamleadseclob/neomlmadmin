@@ -5,11 +5,17 @@ import {
   FiFilter, FiEdit3, FiX
 } from 'react-icons/fi';
 import { BsFiletypePdf } from 'react-icons/bs';
-import { getDistributionData , updateRoiDistributionData, distributeRoi} from '../api/distributionApi';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { getDistributionData , updateRoiDistributionData, distributeRoi , getDistributionHistory} from '../api/distributionApi';
 
 
 const Distribution = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [history, setHistory] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalDocs, setTotalDocs] = useState(0);
+  const limit = 10;
 
   const [roiDistributionData, setRoiDistributionData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -30,6 +36,23 @@ const Distribution = () => {
 
     fetchDistributionData();
   }, []);
+
+  React.useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const res = await getDistributionHistory({ page: currentPage, limit });
+        setHistory(res.data?.data || []);
+        const pg = res.data?.pagination;
+        if (pg) {
+          setTotalPages(pg.totalPages);
+          setTotalDocs(pg.totalDocs);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchHistory();
+  }, [currentPage]);
 
   const handleEditROI = () => {
     setEditValue(roiDistributionData?.dailyRoiPercentage || '');
@@ -58,21 +81,46 @@ const Distribution = () => {
     }
   };
 
-  const totalPages = 190;
-  const totalDocs = 1341;
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
 
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case 'COMPLETED':
-        return 'text-[#00e396] bg-[#00e396]/10 border border-[#00e396]/30';
-      case 'PENDING':
-        return 'text-yellow-400 bg-yellow-400/10 border border-yellow-400/30';
-      case 'FAILED':
-        return 'text-red-400 bg-red-400/10 border border-red-400/30';
-      default:
-        return 'text-gray-400 bg-gray-400/10 border border-gray-400/30';
-    }
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ROI Distribution Report', 14, 20);
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
+    doc.text(`Total Records: ${totalDocs}`, 14, 34);
+
+    const tableData = history.map((row, idx) => [
+      String((currentPage - 1) * limit + idx + 1).padStart(2, '0'),
+      new Date(row.distributedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+      row.totalUsersEarned,
+      `$${row.totalRoiDistributed.toLocaleString()}`,
+      `${row.roiPercentage}%`
+    ]);
+
+    autoTable(doc, {
+      startY: 42,
+      head: [['SL. No', 'Date', 'Users Earned', 'Total ROI Distributed', 'ROI %']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [15, 21, 34], textColor: [0, 227, 150], fontStyle: 'bold', fontSize: 9 },
+      bodyStyles: { fontSize: 9, textColor: [50, 50, 50] },
+      alternateRowStyles: { fillColor: [245, 247, 250] },
+      columnStyles: {
+        0: { halign: 'center', cellWidth: 20 },
+        2: { halign: 'center' },
+        3: { halign: 'right' },
+        4: { halign: 'center' }
+      },
+    });
+
+    doc.save(`ROI_Distribution_Report_Page${currentPage}.pdf`);
   };
+
 
   return (
     <div className="flex flex-col space-y-6 w-full max-w-350 mx-auto pb-10">
@@ -173,7 +221,7 @@ const Distribution = () => {
 
         {/* Actions */}
         <div className="flex items-end gap-3 self-end md:self-auto mt-2 md:mt-0">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[11px] font-bold text-gray-300 hover:bg-[#151c2b] hover:border-gray-600 transition-all cursor-pointer">
+          <button onClick={handleExportPDF} className="flex items-center gap-2 px-4 py-2.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[11px] font-bold text-gray-300 hover:bg-[#151c2b] hover:border-gray-600 transition-all cursor-pointer">
             <BsFiletypePdf className="w-3.5 h-3.5 text-gray-400" />
             Export PDF
           </button>
@@ -184,102 +232,98 @@ const Distribution = () => {
         </div>
       </div>
 
-      {/* ROI Distribution Table */}
+      {/* ROI Distribution History Table */}
       <div className="bg-[#0f1522] border border-[#2d3a4f] rounded-[14px] overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-150">
-            <thead>
-              <tr className="border-b border-[#2d3a4f] bg-[#0a0f1e]/60">
-                <th className="text-left px-6 py-5 text-[10px] font-bold tracking-[0.12em] text-gray-400 uppercase w-25">
-                  SL. NO
-                </th>
-                <th className="text-left px-6 py-5 text-[10px] font-bold tracking-[0.12em] text-gray-400 uppercase">
-                  Date & Time
-                </th>
-                <th className="text-left px-6 py-5 text-[10px] font-bold tracking-[0.12em] text-gray-400 uppercase">
-                  Total ROI
-                </th>
-                <th className="text-right px-6 py-5 text-[10px] font-bold tracking-[0.12em] text-gray-400 uppercase">
-                  Status
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { id: 1, date: 'Oct 24, 2023', time: '09:45:22 AM', total: '2,450.00', status: 'COMPLETED' },
-                { id: 2, date: 'Oct 24, 2023', time: '09:45:22 AM', total: '2,450.00', status: 'COMPLETED' },
-                { id: 3, date: 'Oct 24, 2023', time: '10:23:55 AM', total: '2,450.00', status: 'COMPLETED' },
-                { id: 4, date: 'Oct 24, 2023', time: '10:23:55 AM', total: '2,450.00', status: 'COMPLETED' },
-              ].map((row, idx) => (
-                <tr
-                  key={row.id}
-                  className="border-b border-[#2d3a4f]/60 hover:bg-[#1a2435] transition-colors group"
-                >
-                  <td className="px-6 py-5 text-[13px] font-semibold text-gray-300">
-                    {String((currentPage - 1) * 10 + idx + 1).padStart(2, '0')}
-                  </td>
-                  <td className="px-6 py-5">
-                    <p className="text-[13px] font-bold text-white">{row.date}</p>
-                    <p className="text-[10px] text-gray-400 font-medium mt-0.5">{row.time}</p>
-                  </td>
-                  <td className="px-6 py-5 text-[14px] font-bold text-white tracking-tight">
-                    {row.total}
-                  </td>
-                  <td className="px-6 py-5 text-right">
-                    <span className={`inline-block px-2.5 py-1 rounded text-[10px] font-bold tracking-wider uppercase ${getStatusStyle(row.status)}`}>
-                      {row.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="grid grid-cols-[0.5fr_1.2fr_0.8fr_1.2fr_0.6fr] gap-4 px-6 py-4 text-[10px] font-bold tracking-[0.12em] text-gray-400 uppercase border-b border-[#2d3a4f] bg-[#0a0f1e]/60 min-w-[650px]">
+            <span>SL. NO</span>
+            <span>Date & Time</span>
+            <span className="text-center">Users Earned</span>
+            <span className="text-center">Total ROI Distributed</span>
+            <span className="text-right">ROI %</span>
+          </div>
+
+          {history.length === 0 ? (
+            <div className="px-6 py-12 text-center text-[13px] text-gray-500">No distribution history found.</div>
+          ) : (
+            history.map((row, idx) => (
+              <div
+                key={row._id}
+                className="grid grid-cols-[0.5fr_1.2fr_0.8fr_1.2fr_0.6fr] gap-4 px-6 py-4 items-center border-b border-[#2d3a4f]/60 hover:bg-[#1a2435] transition-colors min-w-[650px]"
+              >
+                <span className="text-[13px] font-semibold text-gray-400">
+                  {String((currentPage - 1) * limit + idx + 1).padStart(2, '0')}
+                </span>
+                <div>
+                  <p className="text-[13px] font-bold text-white leading-tight">
+                    {new Date(row.distributedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
+                  </p>
+                  <p className="text-[10px] text-gray-500 font-medium mt-0.5">
+                    {new Date(row.distributedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  </p>
+                </div>
+                <p className="text-[14px] font-bold text-white text-center">{row.totalUsersEarned}</p>
+                <p className="text-[14px] font-bold text-[#00e396] text-center tracking-tight">
+                  ${row.totalRoiDistributed.toLocaleString()}
+                </p>
+                <div className="text-right">
+                  <span className="inline-block px-3 py-1.5 rounded-md text-[11px] font-bold tracking-wide text-[#00e396] bg-[#00e396]/10 border border-[#00e396]/20">
+                    {row.roiPercentage}%
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Pagination */}
         <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-[#2d3a4f]">
           <p className="text-[12px] text-gray-400 font-medium mb-3 sm:mb-0">
-            Showing 1 to 4 of {totalDocs.toLocaleString()} transactions
+            Showing {totalDocs === 0 ? 0 : ((currentPage - 1) * limit) + 1}-{Math.min(currentPage * limit, totalDocs)} of {totalDocs.toLocaleString()} entries
           </p>
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-md text-gray-500 hover:text-gray-300 hover:bg-[#1e293b]/50 transition-colors cursor-pointer disabled:opacity-30"
+              className="w-8 h-8 rounded-lg border border-[#1e293b] flex items-center justify-center text-gray-500 hover:text-gray-300 hover:bg-[#1e293b]/50 transition-colors cursor-pointer disabled:opacity-30"
             >
               <FiChevronLeft className="w-4 h-4" />
             </button>
 
-            {[1, 2, 3].map(page => (
+            {Array.from({ length: Math.min(totalPages, 3) }, (_, i) => i + 1).map(page => (
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-8 h-8 rounded-md text-[12px] font-bold transition-all cursor-pointer ${
+                className={`w-8 h-8 rounded-lg text-[12px] font-bold transition-all cursor-pointer ${
                   currentPage === page
                     ? 'bg-[#00e396] text-[#0a0f1e] shadow-[0_0_10px_rgba(0,227,150,0.3)]'
-                    : 'text-gray-400 hover:bg-[#1e293b]/50 hover:text-gray-200'
+                    : 'border border-[#1e293b] text-gray-400 hover:bg-[#1e293b]/50 hover:text-gray-200'
                 }`}
               >
                 {page}
               </button>
             ))}
 
-            <span className="text-gray-500 text-xs px-1">...</span>
-            <button
-              onClick={() => setCurrentPage(totalPages)}
-              className={`w-8 h-8 rounded-md text-[12px] font-bold transition-all cursor-pointer ${
-                currentPage === totalPages
-                  ? 'bg-[#00e396] text-[#0a0f1e] shadow-[0_0_10px_rgba(0,227,150,0.3)]'
-                  : 'text-gray-400 hover:bg-[#1e293b]/50 hover:text-gray-200'
-              }`}
-            >
-              {totalPages}
-            </button>
+            {totalPages > 3 && (
+              <>
+                <span className="text-gray-500 text-xs px-1">...</span>
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  className={`w-8 h-8 rounded-lg text-[12px] font-bold transition-all cursor-pointer ${
+                    currentPage === totalPages
+                      ? 'bg-[#00e396] text-[#0a0f1e] shadow-[0_0_10px_rgba(0,227,150,0.3)]'
+                      : 'border border-[#1e293b] text-gray-400 hover:bg-[#1e293b]/50 hover:text-gray-200'
+                  }`}
+                >
+                  {totalPages}
+                </button>
+              </>
+            )}
 
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="p-1.5 rounded-md text-gray-500 hover:text-gray-300 hover:bg-[#1e293b]/50 transition-colors cursor-pointer disabled:opacity-30"
+              className="w-8 h-8 rounded-lg border border-[#1e293b] flex items-center justify-center text-gray-500 hover:text-gray-300 hover:bg-[#1e293b]/50 transition-colors cursor-pointer disabled:opacity-30"
             >
               <FiChevronRight className="w-4 h-4" />
             </button>

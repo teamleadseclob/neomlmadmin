@@ -4,35 +4,43 @@ import { BsClipboardData, BsGrid } from "react-icons/bs"
 import { TbChartBar, TbArrowsExchange } from "react-icons/tb"
 import { RiMoneyDollarCircleLine } from "react-icons/ri"
 import { FiAward } from "react-icons/fi"
-import { IoDownloadOutline, IoSettingsOutline, IoNotificationsOutline } from "react-icons/io5"
+import { IoDownloadOutline, IoSettingsOutline, IoNotificationsOutline, IoWalletOutline } from "react-icons/io5"
+import { MdOutlinePendingActions, MdOutlinePaid } from "react-icons/md"
+import { GiTwoCoins } from "react-icons/gi"
 import { getDashboardDataApi } from "../../api/dashboardApi"
 
 const StatCard = ({ icon, label, value, todayLabel = "TODAY", todayValue }) => (
-  <div className="rounded-xl border border-[#2d3a4f] bg-[#0d1321] p-4 sm:p-5 flex flex-col justify-between min-h-[140px] sm:min-h-[150px]">
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <span className="text-[#25c3a3] text-base">{icon}</span>
-        <span className="text-[11px] sm:text-[12px] font-bold tracking-wider text-[#b0bec5] uppercase">{label}</span>
+  <div className="rounded-2xl border-1 border-[#737c7a]/50 bg-[#0a1018] p-6 sm:p-7 flex flex-col justify-between min-h-[160px] sm:min-h-[175px] shadow-[0_0_30px_rgba(109,119,116,0.35)] transition-all duration-300 hover:bg-gradient-to-br hover:from-[#0f2a1f] hover:to-[#0a1a14] hover:border-[#14CA74]/60 cursor-pointer">
+    <div className="flex items-start justify-between">
+      <div className="w-14 h-14 rounded-xl bg-[#0f1a24] border border-[#1a2a3a] flex items-center justify-center text-[#14CA74] text-2xl">
+        {icon}
       </div>
-      <div className="flex items-center gap-1.5">
-        <span className="text-[9px] sm:text-[10px] font-bold px-2 sm:px-2.5 py-1 rounded bg-[#25c3a3] text-black">{todayLabel}: {todayValue}</span>
+      <div className="text-right">
+        <p className="text-[10px] font-bold tracking-[0.15em]  uppercase">{todayLabel}</p>
+        <p className="text-[18px] sm:text-[20px] font-bold text-[#14CA74] mt-1">{todayValue}</p>
       </div>
     </div>
-    <div>
-      <p className="text-[20px] sm:text-[26px] font-bold text-white mt-3">{value}</p>
+    <div className="mt-5">
+      <p className="text-[12px] font-semibold sm:text-[14px] text-[#6b7f8e] mb-1.5">{label}</p>
+      <p className="text-[26px] sm:text-[32px] font-extrabold text-white leading-none tracking-tight">{value}</p>
     </div>
   </div>
 )
 
 
 const cardConfig = [
-  { key: "totalUsers", icon: <HiOutlineUserAdd />, label: "Total Users" },
-  { key: "totalSwpPurchased", icon: <BsClipboardData />, label: "Total SWP Purchased", prefix: "$" },
-  { key: "totalInvested", icon: <BsGrid />, label: "Total Invested", prefix: "$" },
-  { key: "totalLevelIncome", icon: <TbChartBar />, label: "Total Level Income", prefix: "$" },
-  { key: "totalRoiDistributed", icon: <RiMoneyDollarCircleLine />, label: "Total ROI Distributed", prefix: "$" },
-  { key: "totalMultiLevelReward", icon: <TbArrowsExchange />, label: "Total Multi Level Reward", prefix: "$" },
-  { key: "totalRankIncome", icon: <FiAward />, label: "Total Rank Income", prefix: "$" },
+  { key: "totalUsers", icon: <HiOutlineUserAdd />, label: "Total Users", hasToday: true },
+  { key: "totalSwpPurchased", icon: <BsClipboardData />, label: "Total SWP Purchased", prefix: "$", hasToday: true },
+  { key: "totalInvested", icon: <BsGrid />, label: "Total Invested", prefix: "$", hasToday: true },
+  { key: "totalLevelIncome", icon: <TbChartBar />, label: "Total Level Income", prefix: "$", hasToday: true },
+  { key: "totalRoiDistributed", icon: <RiMoneyDollarCircleLine />, label: "Total ROI Distributed", prefix: "$", hasToday: true },
+  { key: "totalMultiLevelReward", icon: <TbArrowsExchange />, label: "Total Multi Level Reward", prefix: "$", hasToday: true },
+  { key: "totalRankIncome", icon: <FiAward />, label: "Total Rank Income", prefix: "$", hasToday: true },
+  { key: "totalPendingWithdrawal", icon: <MdOutlinePendingActions />, label: "Total Pending Withdrawal", prefix: "$" },
+  { key: "totalPaidWithdrawal", icon: <MdOutlinePaid />, label: "Total Paid Withdrawal", prefix: "$" },
+  { key: "poolFund", icon: <GiTwoCoins />, label: "Pool Fund", prefix: "$" },
+  { key: "managementFund", icon: <IoWalletOutline />, label: "Management Fund", prefix: "$" },
+  { key: "operationWalletFund", icon: <IoSettingsOutline />, label: "Operation Wallet Fund", prefix: "$" },
 ]
 
 const fmt = (val, prefix = "") => `${prefix}${Number(val).toLocaleString()}`
@@ -72,13 +80,13 @@ const DashboardContent = () => {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-4 sm:mb-5">
-        {cardConfig.map(({ key, icon, label, prefix }) => (
+        {cardConfig.map(({ key, icon, label, prefix, hasToday }) => (
           <StatCard
             key={key}
             icon={icon}
             label={label}
-            value={data ? fmt(data[key]?.total, prefix) : "--"}
-            todayValue={data ? fmt(data[key]?.today, prefix) : "--"}
+            value={data ? fmt(hasToday ? data[key]?.total : data[key], prefix) : "--"}
+            todayValue={data && hasToday ? fmt(data[key]?.today, prefix) : "--"}
           />
         ))}
       </div>
