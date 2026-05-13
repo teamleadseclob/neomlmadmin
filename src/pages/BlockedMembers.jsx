@@ -57,12 +57,12 @@ const BlockedMembers = () => {
           <h1 className="text-[22px] sm:text-[28px] font-bold text-white leading-tight">
             Blocked Members
           </h1>
-          <p className="text-[11px] sm:text-[13px] text-[#94a3b8] mt-1.5 max-w-[520px] leading-relaxed">
+          <p className="text-[11px] sm:text-[13px] text-[#94a3b8] mt-1.5 max-w-130 leading-relaxed">
             Restricted access repository. Managed accounts within this directory are currently suspended from
             system interaction due to policy violations or executive overrides.
           </p>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <button className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#1e293b] flex items-center justify-center text-[#94a3b8] hover:bg-[#111827] transition-colors cursor-pointer">
             <IoSettingsOutline className="text-[16px] sm:text-[18px]" />
           </button>
@@ -75,7 +75,7 @@ const BlockedMembers = () => {
       {/* ═══════════ Search & Export ═══════════ */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-6">
         <div className="flex-1 flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl border border-[#1e293b] bg-[#0d1321]">
-          <FiSearch className="text-[#64748b] text-lg flex-shrink-0" />
+          <FiSearch className="text-[#64748b] text-lg shrink-0" />
           <input
             type="text"
             placeholder="Global search for members, IDs, or transactions..."
@@ -93,7 +93,7 @@ const BlockedMembers = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-6 sm:mb-8">
         {/* Currently Restricted */}
         <div className="rounded-xl border border-[#1e293b] bg-[#0d1321] p-5 sm:p-6 flex items-center justify-between overflow-hidden">
-          <div className="flex-shrink-0 z-10">
+          <div className="shrink-0 z-10">
             <p className="text-[9px] sm:text-[10px] font-bold tracking-[0.15em] text-[#64748b] uppercase mb-2">
               Currently Restricted
             </p>
@@ -102,7 +102,7 @@ const BlockedMembers = () => {
               +12% <span className="text-[#475569] font-normal">vs Previous Month</span>
             </p>
           </div>
-          <div className="w-[130px] sm:w-[160px] h-[80px] sm:h-[100px] flex-shrink-0 opacity-80">
+          <div className="w-32.5 sm:w-40 h-20 sm:h-25 shrink-0 opacity-80">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={sparkData}>
                 <defs>
@@ -135,9 +135,9 @@ const BlockedMembers = () => {
               <span className="text-[11px] sm:text-[12px] text-[#64748b]">Policy Violation</span>
               <span className="text-[11px] sm:text-[12px] text-white font-semibold">42%</span>
             </div>
-            <div className="w-full h-[6px] rounded-full bg-[#1e293b] overflow-hidden">
+            <div className="w-full h-1.5 rounded-full bg-[#1e293b] overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#25c3a3] to-[#10b981]"
+                className="h-full rounded-full bg-linear-to-r from-[#25c3a3] to-[#10b981]"
                 style={{ width: "42%" }}
               />
             </div>
@@ -171,7 +171,7 @@ const BlockedMembers = () => {
         {/* Scrollable Table */}
         <div className="overflow-x-auto">
           {/* Table Header */}
-          <div className="grid grid-cols-[0.8fr_1.1fr_1fr_1.2fr_0.8fr] gap-4 px-6 py-3 text-[9px] sm:text-[10px] font-bold tracking-[0.12em] text-[#94a3b8] uppercase border-t border-b border-[#2d3a4f] bg-[#080d1a]/60 min-w-[700px]">
+          <div className="grid grid-cols-[0.8fr_1.1fr_1fr_1.2fr_0.8fr] gap-4 px-6 py-3 text-[9px] sm:text-[10px] font-bold tracking-[0.12em] text-[#94a3b8] uppercase border-t border-b border-[#2d3a4f] bg-[#080d1a]/60 min-w-175">
             <span>User ID</span>
             <span>Member Entity</span>
             <span>Email</span>
@@ -183,14 +183,14 @@ const BlockedMembers = () => {
           {blockedMembers.map((member) => (
             <div
               key={member._id}
-              className="grid grid-cols-[0.8fr_1.1fr_1fr_1.2fr_0.8fr] gap-4 px-6 py-4 sm:py-5 items-center border-b border-[#2d3a4f]/60 hover:bg-[#1a2435] transition-colors min-w-[700px]"
+              className="grid grid-cols-[0.8fr_1.1fr_1fr_1.2fr_0.8fr] gap-4 px-6 py-4 sm:py-5 items-center border-b border-[#2d3a4f]/60 hover:bg-[#1a2435] transition-colors min-w-175"
             >
               <span className="text-[12px] sm:text-[13px] text-[#b0bec5] font-medium">
                 {member.userId}
               </span>
 
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#111d2e] border border-[#1e293b] flex items-center justify-center text-[#25c3a3] flex-shrink-0">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#111d2e] border border-[#1e293b] flex items-center justify-center text-[#25c3a3] shrink-0">
                   <HiOutlineUser className="text-[14px] sm:text-[16px]" />
                 </div>
                 <span className="text-[12px] sm:text-[13px] font-semibold text-white">{member.name}</span>
@@ -214,7 +214,7 @@ const BlockedMembers = () => {
 
         {/* Footer / Pagination */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-4 gap-3 border-t border-[#2d3a4f]/60">
-          <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.1em] text-[#94a3b8] uppercase">
+          <span className="text-[10px] sm:text-[11px] font-bold tracking-widest text-[#94a3b8] uppercase">
             Showing {((page - 1) * limit) + 1}-{Math.min(page * limit, total)} of {total.toLocaleString()} entries
           </span>
           <div className="flex items-center gap-1">

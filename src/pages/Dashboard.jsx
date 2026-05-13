@@ -1,8 +1,6 @@
 import DashboardContent from "../components/dashboard/DashboardContent"
 import RevenueChart from "../components/dashboard/RevenueChart"
 import TotalProfitChart from "../components/dashboard/TotalProfitChart"
-import TotalSessionsChart from "../components/dashboard/TotalSessionsChart"
-import UsersByDevice from "../components/dashboard/UsersByDevice"
 import RecentOrders from "../components/dashboard/RecentOrders"
 import { IoDownloadOutline } from "react-icons/io5"
 
@@ -12,7 +10,7 @@ const Dashboard = () => (
 
     {/* Charts Section */}
     <div className="grid grid-cols-1 xl:grid-cols-[3fr_2fr] gap-5 mt-10 sm:mt-20">
-      <div className="min-h-[350px] sm:min-h-[460px]">
+      <div className="min-h-87.5 sm:min-h-115">
         <RevenueChart />
       </div>
       <div className="h-full">

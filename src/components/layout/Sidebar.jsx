@@ -1,4 +1,5 @@
 import { useState } from "react"
+import PropTypes from "prop-types"
 import { NavLink, useLocation } from "react-router-dom"
 import { IoChevronDown, IoCloseOutline } from "react-icons/io5"
 
@@ -50,7 +51,7 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen w-[240px] bg-[#0b1120] border-r border-[#25c3a3]/25 shadow-[2px_0_20px_rgba(0,0,0,0.6)] flex flex-col z-50 transition-transform duration-300 ease-in-out ${
+      className={`fixed top-0 left-0 h-screen w-60 bg-[#0b1120] border-r border-[#25c3a3]/25 shadow-[2px_0_20px_rgba(0,0,0,0.6)] flex flex-col z-50 transition-transform duration-300 ease-in-out ${
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       }`}
     >
@@ -169,6 +170,12 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
   
     </aside>
   )
+}
+
+Sidebar.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onLogout: PropTypes.func.isRequired,
 }
 
 export default Sidebar

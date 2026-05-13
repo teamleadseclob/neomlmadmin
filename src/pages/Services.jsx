@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import {
-  FiSettings, FiBell, FiUploadCloud, FiCalendar,
+  FiSettings, FiBell, FiUploadCloud, 
   FiChevronDown, FiAward, FiBook, FiTool
 } from 'react-icons/fi';
 import { createEvent } from '../api/services';
@@ -83,7 +83,7 @@ const Services = () => {
   ];
 
   return (
-    <div className="flex flex-col space-y-6 w-full max-w-[1400px] mx-auto pb-10">
+    <div className="flex flex-col space-y-6 w-full max-w-350 mx-auto pb-10">
 
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -93,7 +93,7 @@ const Services = () => {
             Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took
           </p>
         </div>
-        <div className="flex items-center gap-3 self-end md:self-auto flex-shrink-0">
+        <div className="flex items-center gap-3 self-end md:self-auto shrink-0">
           <button className="p-2.5 rounded-full bg-[#1e293b]/50 hover:bg-[#1e293b] border border-gray-700/50 text-gray-300 transition-all cursor-pointer">
             <FiSettings className="w-5 h-5" />
           </button>
@@ -134,7 +134,7 @@ const Services = () => {
 
           {/* Campaign Title */}
           <div className="mb-6">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='Campaign Title' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Campaign Title*
             </label>
             <input
@@ -148,7 +148,7 @@ const Services = () => {
 
           {/* Sub Title */}
           <div className="mb-6">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='Sub Title' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Sub Title
             </label>
             <input
@@ -162,7 +162,7 @@ const Services = () => {
 
           {/* Description */}
           <div className="mb-6">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='Description' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Description
             </label>
             <textarea
@@ -178,10 +178,11 @@ const Services = () => {
 
           {/* Background Image Upload */}
           <div className="mb-6">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='Background Image' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Background Image Upload
             </label>
-            <div
+            <button
+              type="button"
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -212,13 +213,13 @@ const Services = () => {
                   </p>
                 </>
               )}
-            </div>
+            </button>
           </div>
 
           {/* Start Date & End Date */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              <label htmlFor='Start Date' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
                 Start Date
               </label>
               <div className="relative">
@@ -226,13 +227,13 @@ const Services = () => {
                   type="date"
                   value={contestForm.startDate}
                   onChange={(e) => handleContestChange('startDate', e.target.value)}
-                  className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors [color-scheme:dark]"
+                  className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors scheme-dark"
                   placeholder="mm/dd/yyyy"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              <label htmlFor='End Date' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
                 End Date
               </label>
               <div className="relative">
@@ -240,7 +241,7 @@ const Services = () => {
                   type="date"
                   value={contestForm.endDate}
                   onChange={(e) => handleContestChange('endDate', e.target.value)}
-                  className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors [color-scheme:dark]"
+                  className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors scheme-dark"
                   placeholder="mm/dd/yyyy"
                 />
               </div>
@@ -267,6 +268,7 @@ const Services = () => {
                   await createEvent(payload);
                   alert('Campaign deployed successfully!');
                 } catch (err) {
+                  console.error('Deploy campaign failed:', err);
                   alert('Failed to deploy campaign');
                 }
               }}
@@ -290,7 +292,7 @@ const Services = () => {
 
           {/* Package Name */}
           <div className="mb-6">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='Package Name' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Package Name*
             </label>
             <input
@@ -304,7 +306,7 @@ const Services = () => {
 
           {/* Category */}
           <div className="mb-6">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='Category' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Category
             </label>
             <div className="relative">
@@ -324,7 +326,7 @@ const Services = () => {
 
           {/* Description */}
           <div className="mb-6">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='Description' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Description
             </label>
             <textarea
@@ -338,10 +340,11 @@ const Services = () => {
 
           {/* Background Image Upload */}
           <div className="mb-6">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='Background Image' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Background Image Upload
             </label>
-            <div
+            <button
+              type="button"
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -372,13 +375,13 @@ const Services = () => {
                   </p>
                 </>
               )}
-            </div>
+            </button>
           </div>
 
           {/* Price & Duration */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              <label htmlFor='Price' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
                 Price (USD)
               </label>
               <input
@@ -390,7 +393,7 @@ const Services = () => {
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              <label htmlFor='Duration' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
                 Duration
               </label>
               <input
@@ -405,11 +408,12 @@ const Services = () => {
 
           {/* Access Level */}
           <div className="mb-8">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='AccessLevel' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Access Level
             </label>
             <div className="relative">
               <select
+                id='AccessLevel'
                 value={learningForm.accessLevel}
                 onChange={(e) => handleLearningChange('accessLevel', e.target.value)}
                 className="appearance-none w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white focus:outline-none focus:border-[#25c3a3]/50 transition-colors cursor-pointer"
@@ -434,7 +438,7 @@ const Services = () => {
                   description: learningForm.description,
                   type: 'learning_package',
                   mediaUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
-                  expiryDays: parseInt(learningForm.duration) || 30,
+                  expiryDays: Number.parseInt(learningForm.duration) || 30,
                   category: learningForm.category,
                   price: learningForm.price,
                   duration: learningForm.duration,
@@ -444,6 +448,7 @@ const Services = () => {
                   await createEvent(payload);
                   alert('Package published successfully!');
                 } catch (err) {
+                  console.error('Publish package failed:', err);
                   alert('Failed to publish package');
                 }
               }}
@@ -467,11 +472,12 @@ const Services = () => {
 
           {/* Tool Name */}
           <div className="mb-6">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='Tool Name' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Tool Name*
             </label>
             <input
               type="text"
+              id='Tool Name'
               value={toolsForm.toolName}
               onChange={(e) => handleToolsChange('toolName', e.target.value)}
               className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors"
@@ -481,7 +487,7 @@ const Services = () => {
 
           {/* Tool Type */}
           <div className="mb-6">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='Tool Type' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Tool Type
             </label>
             <div className="relative">
@@ -501,7 +507,7 @@ const Services = () => {
 
           {/* Description */}
           <div className="mb-6">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='Description' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Description
             </label>
             <textarea
@@ -515,10 +521,11 @@ const Services = () => {
 
           {/* Background Image Upload */}
           <div className="mb-6">
-            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+            <label htmlFor='Background Image' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
               Background Image Upload
             </label>
-            <div
+            <button
+              type="button"
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -549,13 +556,13 @@ const Services = () => {
                   </p>
                 </>
               )}
-            </div>
+            </button>
           </div>
 
           {/* Access Level & Status */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              <label htmlFor='AccessLevel'  className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
                 Access Level
               </label>
               <div className="relative">
@@ -572,7 +579,7 @@ const Services = () => {
               </div>
             </div>
             <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              <label htmlFor='Status' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
                 Status
               </label>
               <div className="relative">
@@ -611,6 +618,7 @@ const Services = () => {
                   await createEvent(payload);
                   alert('Tool deployed successfully!');
                 } catch (err) {
+                  console.error('Failed to deploy tool:', err);
                   alert('Failed to deploy tool');
                 }
               }}

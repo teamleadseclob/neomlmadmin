@@ -101,203 +101,57 @@ const reportModules = [
   },
 ];
 
+const downloadFile = async (apiFn, filename, mimeType) => {
+  try {
+    const res = await apiFn();
+    const url = globalThis.URL.createObjectURL(new Blob([res.data], { type: mimeType }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    globalThis.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error(`Failed to download ${filename}:`, err);
+  }
+};
+
+const PDF_TYPE = 'application/pdf';
+const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+const exportHandlers = {
+  1: {
+    excel: () => downloadFile(getTransactionsExcel, 'transactions_report.xlsx', EXCEL_TYPE),
+    pdf: () => downloadFile(getTransactionsPdf, 'transactions_report.pdf', PDF_TYPE),
+  },
+  2: {
+    excel: () => downloadFile(getSwpPackagesExcel, 'swp_packages_report.xlsx', EXCEL_TYPE),
+    pdf: () => downloadFile(getSwpPackagesPdf, 'swp_packages_report.pdf', PDF_TYPE),
+  },
+  3: {
+    excel: () => downloadFile(getTradingCapitalProfitExcel, 'trading_capital_profit_report.xlsx', EXCEL_TYPE),
+    pdf: () => downloadFile(getTradingCapitalProfitPdf, 'trading_capital_profit_report.pdf', PDF_TYPE),
+  },
+  5: {
+    excel: () => downloadFile(getRankRewardsExcel, 'rank_rewards_report.xlsx', EXCEL_TYPE),
+    pdf: () => downloadFile(getRankRewardsPdf, 'rank_rewards_report.pdf', PDF_TYPE),
+  },
+  6: {
+    excel: () => downloadFile(getMultilevelRewardsExcel, 'multilevel_rewards_report.xlsx', EXCEL_TYPE),
+    pdf: () => downloadFile(getMultilevelRewardsPdf, 'multilevel_rewards_report.pdf', PDF_TYPE),
+  },
+  12: {
+    excel: () => downloadFile(getApprovedWithdrawalsExcel, 'approved_withdrawals_report.xlsx', EXCEL_TYPE),
+    pdf: () => downloadFile(getApprovedWithdrawalsPdf, 'approved_withdrawals_report.pdf', PDF_TYPE),
+  },
+};
+
 const Reports = () => {
   const [activeFilter, setActiveFilter] = useState('Monthly');
 
-  const handleTransactionsPdf = async () => {
-    try {
-      const res = await getTransactionsPdf();
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'transactions_report.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download PDF:', err);
-    }
-  };
-
-  const handleTransactionsExcel = async () => {
-    try {
-      const res = await getTransactionsExcel();
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'transactions_report.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download Excel:', err);
-    }
-  };
-
-  const handleRankRewardsPdf = async () => {
-    try {
-      const res = await getRankRewardsPdf();
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'rank_rewards_report.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download PDF:', err);
-    }
-  };
-
-  const handleRankRewardsExcel = async () => {
-    try {
-      const res = await getRankRewardsExcel();
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'rank_rewards_report.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download Excel:', err);
-    }
-  };
-
-  const handleSwpPackagesPdf = async () => {
-    try {
-      const res = await getSwpPackagesPdf();
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'swp_packages_report.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download PDF:', err);
-    }
-  };
-
-  const handleSwpPackagesExcel = async () => {
-    try {
-      const res = await getSwpPackagesExcel();
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'swp_packages_report.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download Excel:', err);
-    }
-  };
-
-  const handleMultilevelRewardsPdf = async () => {
-    try {
-      const res = await getMultilevelRewardsPdf();
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'multilevel_rewards_report.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download PDF:', err);
-    }
-  };
-
-  const handleMultilevelRewardsExcel = async () => {
-    try {
-      const res = await getMultilevelRewardsExcel();
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'multilevel_rewards_report.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download Excel:', err);
-    }
-  };
-
-  const handleApprovedWithdrawalsPdf = async () => {
-    try {
-      const res = await getApprovedWithdrawalsPdf();
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'approved_withdrawals_report.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download PDF:', err);
-    }
-  };
-
-  const handleApprovedWithdrawalsExcel = async () => {
-    try {
-      const res = await getApprovedWithdrawalsExcel();
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'approved_withdrawals_report.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download Excel:', err);
-    }
-  };
-
-  const handleTradingCapitalProfitPdf = async () => {
-    try {
-      const res = await getTradingCapitalProfitPdf();
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'trading_capital_profit_report.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download PDF:', err);
-    }
-  };
-
-  const handleTradingCapitalProfitExcel = async () => {
-    try {
-      const res = await getTradingCapitalProfitExcel();
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'trading_capital_profit_report.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download Excel:', err);
-    }
-  };
-
   return (
-    <div className="flex flex-col space-y-6 w-full max-w-[1400px] mx-auto pb-10">
+    <div className="flex flex-col space-y-6 w-full max-w-350 mx-auto pb-10">
       
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -307,7 +161,7 @@ const Reports = () => {
             Access specialized audit logs and financial distributions for the Obsidian Ledger. Precise datasets generated for strategic analysis and regulatory compliance.
           </p>
         </div>
-        <div className="flex items-center gap-3 self-end md:self-auto flex-shrink-0">
+        <div className="flex items-center gap-3 self-end md:self-auto shrink-0">
           <button className="p-2.5 rounded-full bg-[#1e293b]/50 hover:bg-[#1e293b] border border-gray-700/50 text-gray-300 transition-all cursor-pointer">
             <FiSettings className="w-5 h-5" />
           </button>
@@ -346,7 +200,7 @@ const Reports = () => {
         {/* Card 1: Live Ledger Health */}
         <div className="bg-[#0f1522] border border-[#737c7a]/40 rounded-[14px] p-6 relative overflow-hidden flex flex-col justify-between shadow-[0_0_30px_rgba(109,119,116,0.35)]">
           {/* Cyan/Green Left line indicator */}
-          <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-[#00e396] to-[#0ea5e9]"></div>
+          <div className="absolute left-0 top-0 bottom-0 w-0.75 bg-linear-to-b from-[#00e396] to-[#0ea5e9]"></div>
           
           <div className="pl-2">
             <h3 className="text-[11px] font-bold tracking-[0.15em] text-gray-400 mb-5 uppercase">Live Ledger Health</h3>
@@ -381,7 +235,7 @@ const Reports = () => {
             <BsFiletypePdf className="w-6 h-6 text-[#00e396]" />
           </div>
           <h3 className="text-base font-bold text-white mb-2 tracking-wide">Batch Export</h3>
-          <p className="text-xs text-gray-300 max-w-[220px] leading-relaxed">Download all reports for the current period in PDF</p>
+          <p className="text-xs text-gray-300 max-w-55 leading-relaxed">Download all reports for the current period in PDF</p>
         </div>
 
         {/* Card 3: Activity Feed */}
@@ -393,10 +247,10 @@ const Reports = () => {
           
           <div className="space-y-6 flex-1 relative">
             {/* Connecting line */}
-            <div className="absolute left-[3px] top-[14px] bottom-6 w-[2px] bg-[#1e293b]"></div>
+            <div className="absolute left-0.75 top-3.5 bottom-6 w-0.5] bg-[#1e293b]"></div>
 
             <div className="flex items-start gap-4 relative z-10">
-              <div className="w-2 h-2 rounded-full bg-[#00e396] mt-1.5 shadow-[0_0_8px_rgba(0,227,150,0.4)] flex-shrink-0"></div>
+              <div className="w-2 h-2 rounded-full bg-[#00e396] mt-1.5 shadow-[0_0_8px_rgba(0,227,150,0.4)] shrink-0"></div>
               <div>
                 <p className="text-[13px] font-semibold text-white mb-0.5">Royal Rewards Gen.</p>
                 <p className="text-[11px] text-gray-500 font-medium">Completed • 2m ago</p>
@@ -404,7 +258,7 @@ const Reports = () => {
             </div>
             
             <div className="flex items-start gap-4 relative z-10">
-              <div className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shadow-[0_0_8px_rgba(239,68,68,0.4)] flex-shrink-0"></div>
+              <div className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shadow-[0_0_8px_rgba(239,68,68,0.4)] shrink-0"></div>
               <div>
                 <p className="text-[13px] font-semibold text-gray-200 mb-0.5">Failed Export</p>
                 <p className="text-[11px] text-gray-500 font-medium">System Timeout • 45m ago</p>
@@ -417,17 +271,17 @@ const Reports = () => {
 
       {/* Separator / Title */}
       <div className="bg-[#0f1522] border border-[#1e293b] rounded-[10px] px-5 py-3.5 flex items-center mt-2 shadow-sm w-full">
-        <div className="w-2 h-2 rounded-full bg-[#00e396] mr-3 shadow-[0_0_8px_rgba(0,227,150,0.6)] flex-shrink-0"></div>
+        <div className="w-2 h-2 rounded-full bg-[#00e396] mr-3 shadow-[0_0_8px_rgba(0,227,150,0.6)] shrink-0"></div>
         <h2 className="text-[15px] font-bold text-white tracking-wide">Financial Report Modules</h2>
       </div>
 
       {/* 12 Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {reportModules.map((module) => (
-          <div key={module.id} className="bg-[#0f1522] border border-[#737c7a]/40 hover:border-gray-600 transition-all rounded-[14px] p-5 flex flex-col h-[230px] shadow-[0_0_30px_rgba(109,119,116,0.35)] group">
+          <div key={module.id} className="bg-[#0f1522] border border-[#737c7a]/40 hover:border-gray-600 transition-all rounded-[14px] p-5 flex flex-col h-57.5 shadow-[0_0_30px_rgba(109,119,116,0.35)] group">
             <div className="flex justify-between items-start mb-4">
               <div className="w-10 h-10 rounded-[10px] bg-[#1e293b]/30 flex items-center justify-center text-gray-300 group-hover:text-white transition-colors">
-                <module.icon className="w-5 h-5 flex-shrink-0" />
+                <module.icon className="w-5 h-5 shrink-0" />
               </div>
               {module.tag && (
                 <span className={`px-2 py-0.5 text-[9px] font-bold rounded ${module.tagColor} uppercase tracking-widest`}>
@@ -445,17 +299,17 @@ const Reports = () => {
 
             <div className="grid grid-cols-2 gap-3 mt-4">
               <button
-                onClick={module.id === 1 ? handleTransactionsExcel : module.id === 5 ? handleRankRewardsExcel : module.id === 2 ? handleSwpPackagesExcel : module.id === 6 ? handleMultilevelRewardsExcel : module.id === 12 ? handleApprovedWithdrawalsExcel : module.id === 3 ? handleTradingCapitalProfitExcel : undefined}
+                onClick={exportHandlers[module.id]?.excel}
                 className="flex items-center justify-center gap-2 py-2 bg-black/40 border border-[#1e293b] rounded-lg text-[10px] font-bold text-gray-300 hover:bg-[#1e293b]/60 hover:text-white transition-all cursor-pointer"
               >
-                <BsFiletypeXlsx className="w-[14px] h-[14px] text-gray-400" />
+                <BsFiletypeXlsx className="w-3.5 h-3.5 text-gray-400" />
                 EXCEL
               </button>
               <button
-                onClick={module.id === 1 ? handleTransactionsPdf : module.id === 5 ? handleRankRewardsPdf : module.id === 2 ? handleSwpPackagesPdf : module.id === 6 ? handleMultilevelRewardsPdf : module.id === 12 ? handleApprovedWithdrawalsPdf : module.id === 3 ? handleTradingCapitalProfitPdf : undefined}
+                onClick={exportHandlers[module.id]?.pdf}
                 className="flex items-center justify-center gap-2 py-2 bg-black/40 border border-[#1e293b] rounded-lg text-[10px] font-bold text-gray-300 hover:bg-[#1e293b]/60 hover:text-white transition-all cursor-pointer"
               >
-                <BsFiletypePdf className="w-[14px] h-[14px] text-gray-400" />
+                <BsFiletypePdf className="w-3.5 h-3.5 text-gray-400" />
                 PDF
               </button>
             </div>
@@ -466,7 +320,7 @@ const Reports = () => {
         <div className="col-span-1 md:col-span-2 lg:col-span-4 bg-[#0f1522] border border-[#737c7a]/40 hover:border-gray-600 transition-all rounded-[14px] p-6 flex flex-col shadow-[0_0_30px_rgba(109,119,116,0.35)] group">
           <div className="flex justify-between items-start mb-6">
             <div className="w-10 h-10 rounded-[10px] bg-[#1e293b]/30 flex items-center justify-center text-gray-300 group-hover:text-white transition-colors">
-              <FiUsers className="w-5 h-5 flex-shrink-0" />
+              <FiUsers className="w-5 h-5 shrink-0" />
             </div>
             <span className={`px-2 py-0.5 text-[9px] font-bold rounded text-[#00e396] bg-[#00e396]/10 border border-[#00e396]/20 uppercase tracking-widest`}>
               CORE DATA
@@ -482,11 +336,11 @@ const Reports = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <button className="flex items-center justify-center gap-2 py-3 bg-black/40 border border-[#1e293b] rounded-lg text-[11px] font-bold text-gray-300 hover:bg-[#1e293b]/60 hover:text-white transition-all cursor-pointer">
-              <BsFiletypeXlsx className="w-[15px] h-[15px] text-gray-400" />
+              <BsFiletypeXlsx className="w-3.5 h-3.5 text-gray-400" />
               EXCEL
             </button>
             <button className="flex items-center justify-center gap-2 py-3 bg-black/40 border border-[#1e293b] rounded-lg text-[11px] font-bold text-gray-300 hover:bg-[#1e293b]/60 hover:text-white transition-all cursor-pointer">
-              <BsFiletypePdf className="w-[15px] h-[15px] text-gray-400" />
+              <BsFiletypePdf className="w-3.5 h-3.5 text-gray-400" />
               PDF
             </button>
           </div>

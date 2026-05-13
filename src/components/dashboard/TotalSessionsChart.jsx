@@ -30,7 +30,7 @@ const TotalSessionsChart = () => (
         </span>
       </div>
     </div>
-    <div className="flex-1 mt-3 min-h-[120px]">
+    <div className="flex-1 mt-3 min-h-30">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal vertical={false} />

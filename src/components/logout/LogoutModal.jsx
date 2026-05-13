@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom"
+import PropTypes from "prop-types"
 import { TbLogout } from "react-icons/tb"
 
 const LogoutModal = ({ isOpen, onClose }) => {
@@ -13,12 +14,17 @@ const LogoutModal = ({ isOpen, onClose }) => {
   }
 
   return (
-    <div className="absolute inset-0 z-[100] flex items-center justify-center">
+    <div className="absolute inset-0 z-100 flex items-center justify-center">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm border-none cursor-default"
+        onClick={onClose}
+        aria-label="Close modal"
+      />
 
       {/* Modal */}
-      <div className="relative w-[90%] max-w-[420px] rounded-2xl border border-[#1e293b] bg-[#0d1321] p-8 text-center">
+      <div className="relative w-[90%] max-w-105 rounded-2xl border border-[#1e293b] bg-[#0d1321] p-8 text-center">
         {/* Icon */}
         <div className="mx-auto mb-5 w-14 h-14 rounded-full border border-[#25c3a3]/30 bg-[#25c3a3]/10 flex items-center justify-center">
           <TbLogout className="text-[#25c3a3] text-2xl" />
@@ -30,14 +36,14 @@ const LogoutModal = ({ isOpen, onClose }) => {
         </h2>
 
         {/* Description */}
-        <p className="text-[13px] text-[#64748b] leading-relaxed mb-7 max-w-[300px] mx-auto">
+        <p className="text-[13px] text-[#64748b] leading-relaxed mb-7 max-w-75 mx-auto">
           Your current session will be ended securely. All unsaved ledger drafts may be lost.
         </p>
 
         {/* Log Out Button */}
         <button
           onClick={handleLogout}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#10b981] to-[#34d399] text-[#021a12] text-[14px] font-bold hover:from-[#34d399] hover:to-[#6ee7b7] transition-all cursor-pointer shadow-lg shadow-[#10b981]/25 mb-3"
+          className="w-full py-3 rounded-xl bg-linear-to-r from-[#10b981] to-[#34d399] text-[#021a12] text-[14px] font-bold hover:from-[#34d399] hover:to-[#6ee7b7] transition-all cursor-pointer shadow-lg shadow-[#10b981]/25 mb-3"
         >
           Log Out
         </button>
@@ -57,6 +63,11 @@ const LogoutModal = ({ isOpen, onClose }) => {
       </div>
     </div>
   )
+}
+
+LogoutModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 }
 
 export default LogoutModal

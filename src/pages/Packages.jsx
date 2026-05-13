@@ -80,7 +80,7 @@ const Packages = () => {
           swpData.map((item) => (
             <div
               key={item._id}
-              className="group rounded-2xl border border-[#1e293b] bg-gradient-to-b from-[#0d1424] to-[#0b1120] p-5 hover:border-[#25c3a3]/30 hover:shadow-[0_0_24px_rgba(37,195,163,0.06)] transition-all duration-300"
+              className="group rounded-2xl border border-[#1e293b] bg-linear-to-b from-[#0d1424] to-[#0b1120] p-5 hover:border-[#25c3a3]/30 hover:shadow-[0_0_24px_rgba(37,195,163,0.06)] transition-all duration-300"
             >
               {/* Card Header */}
               <div className="flex items-center justify-between mb-5">
@@ -132,7 +132,7 @@ const Packages = () => {
           mlrData.map((item) => (
             <div
               key={item._id}
-              className="group rounded-2xl border border-[#1e293b] bg-gradient-to-b from-[#0d1424] to-[#0b1120] p-5 hover:border-[#0ea5e9]/30 hover:shadow-[0_0_24px_rgba(14,165,233,0.06)] transition-all duration-300"
+              className="group rounded-2xl border border-[#1e293b] bg-linear-to-b from-[#0d1424] to-[#0b1120] p-5 hover:border-[#0ea5e9]/30 hover:shadow-[0_0_24px_rgba(14,165,233,0.06)] transition-all duration-300"
             >
               {/* Card Header */}
               <div className="flex items-center justify-between mb-5">

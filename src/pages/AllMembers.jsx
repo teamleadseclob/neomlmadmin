@@ -16,6 +16,18 @@ const AllMembers = () => {
   const [showFilter, setShowFilter] = useState(false)
   const limit = 10
 
+  const handleStatusChange = async (memberId, newStatus) => {
+    const shouldBlock = newStatus === "blocked"
+    try {
+      await (shouldBlock ? blockUser(memberId) : unblockUser(memberId))
+      setMembers((prev) =>
+        prev.map((u) => u._id === memberId ? { ...u, isBlocked: shouldBlock } : u)
+      )
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   const fetchMembers = () => {
     const params = { page, limit }
     if (search) params.search = search
@@ -175,17 +187,7 @@ const AllMembers = () => {
               <p className="text-[13px] text-[#b0bec5]">{m.sponsorId || "—"}</p>
               <select
                 value={m.isBlocked ? "blocked" : "active"}
-                onChange={async (e) => {
-                  const shouldBlock = e.target.value === "blocked";
-                  try {
-                    await (shouldBlock ? blockUser(m._id) : unblockUser(m._id));
-                    setMembers((prev) =>
-                      prev.map((u) => u._id === m._id ? { ...u, isBlocked: shouldBlock } : u)
-                    );
-                  } catch (err) {
-                    console.error(err);
-                  }
-                }}
+                onChange={(e) => handleStatusChange(m._id, e.target.value)}
                 className={`text-[11px] font-bold tracking-wider px-3 py-1.5 rounded cursor-pointer outline-none border-none ${
                   m.isBlocked
                     ? "bg-[#ef4444]/15 text-[#ef4444]"
@@ -202,7 +204,7 @@ const AllMembers = () => {
 
         {/* Footer / Pagination */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-4 gap-3 border-t border-[#2d3a4f]/60">
-          <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.1em] text-[#94a3b8] uppercase">
+          <span className="text-[10px] sm:text-[11px] font-bold tracking-widest text-[#94a3b8] uppercase">
             Showing {((page - 1) * limit) + 1}-{Math.min(page * limit, totalDocs)} of {totalDocs.toLocaleString()} entries
           </span>
           <div className="flex items-center gap-1">

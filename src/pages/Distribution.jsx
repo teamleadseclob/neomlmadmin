@@ -235,7 +235,7 @@ const Distribution = () => {
       {/* ROI Distribution History Table */}
       <div className="bg-[#0f1522] border border-[#2d3a4f] rounded-[14px] overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
         <div className="overflow-x-auto">
-          <div className="grid grid-cols-[0.5fr_1.2fr_0.8fr_1.2fr_0.6fr] gap-4 px-6 py-4 text-[10px] font-bold tracking-[0.12em] text-gray-400 uppercase border-b border-[#2d3a4f] bg-[#0a0f1e]/60 min-w-[650px]">
+          <div className="grid grid-cols-[0.5fr_1.2fr_0.8fr_1.2fr_0.6fr] gap-4 px-6 py-4 text-[10px] font-bold tracking-[0.12em] text-gray-400 uppercase border-b border-[#2d3a4f] bg-[#0a0f1e]/60 min-w-162.5">
             <span>SL. NO</span>
             <span>Date & Time</span>
             <span className="text-center">Users Earned</span>
@@ -249,7 +249,7 @@ const Distribution = () => {
             history.map((row, idx) => (
               <div
                 key={row._id}
-                className="grid grid-cols-[0.5fr_1.2fr_0.8fr_1.2fr_0.6fr] gap-4 px-6 py-4 items-center border-b border-[#2d3a4f]/60 hover:bg-[#1a2435] transition-colors min-w-[650px]"
+                className="grid grid-cols-[0.5fr_1.2fr_0.8fr_1.2fr_0.6fr] gap-4 px-6 py-4 items-center border-b border-[#2d3a4f]/60 hover:bg-[#1a2435] transition-colors min-w-162.5"
               >
                 <span className="text-[13px] font-semibold text-gray-400">
                   {String((currentPage - 1) * limit + idx + 1).padStart(2, '0')}

@@ -4,7 +4,6 @@ import {
   FiChevronDown, FiChevronLeft, FiChevronRight,
   FiFilter, FiPrinter, FiCheck, FiX
 } from 'react-icons/fi';
-import { BsFiletypePdf } from 'react-icons/bs';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { getWithdrawals, approveWithdrawal, rejectWithdrawal, bulkApproveWithdrawals } from '../api/withdrawals';
@@ -197,8 +196,8 @@ const Withdrawals = () => {
         <div className="rounded-xl border-2 border-[#14CA74]/40 bg-[#0a1018] p-5 shadow-[0_0_30px_rgba(109,119,116,0.35)]">
           <p className="text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-3">Total Requests</p>
           <p className="text-[26px] font-extrabold text-white tracking-tight mb-3">{(summary.totalRequests || 0).toLocaleString()}</p>
-          <div className="w-full h-[3px] bg-[#1e293b] rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-[#0ea5e9] to-[#14CA74] rounded-full" style={{ width: summary.totalRequests ? `${(summary.totalApproved / summary.totalRequests * 100).toFixed(0)}%` : '0%' }}></div>
+          <div className="w-full h-0.75 bg-[#1e293b] rounded-full overflow-hidden">
+            <div className="h-full bg-linear-to-r from-[#0ea5e9] to-[#14CA74] rounded-full" style={{ width: summary.totalRequests ? `${(summary.totalApproved / summary.totalRequests * 100).toFixed(0)}%` : '0%' }}></div>
           </div>
         </div>
 
@@ -458,7 +457,7 @@ const Withdrawals = () => {
       {/* Bulk Approve Confirmation Modal */}
       {showBulkModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowBulkModal(false)}></div>
+          <button type="button" className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowBulkModal(false)}></button>
           <div className="relative bg-[#0f1522] border border-[#1e293b] rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-center w-14 h-14 mx-auto mb-4 rounded-full bg-[#00e396]/10">
               <FiCheck className="w-7 h-7 text-[#00e396]" />

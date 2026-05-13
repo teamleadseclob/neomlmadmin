@@ -1,16 +1,16 @@
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
+import { PieChart, Pie, ResponsiveContainer } from "recharts"
 
 const data = [
-  { name: "Desktop users", value: 15624, color: "#25c3a3" },
-  { name: "Phone app users", value: 5546, color: "#3b82f6" },
-  { name: "Laptop users", value: 2478, color: "#0e7a65" },
+  { name: "Desktop users", value: 15624, fill: "#25c3a3" },
+  { name: "Phone app users", value: 5546, fill: "#3b82f6" },
+  { name: "Laptop users", value: 2478, fill: "#0e7a65" },
 ]
 
 const UsersByDevice = () => (
   <div className="rounded-xl border border-[#1e293b] bg-[#0d1321] p-4 sm:p-6 flex flex-col">
     {/* Gauge Donut */}
     <div className="relative w-full flex justify-center">
-      <div className="relative w-[220px] sm:w-[280px] h-[135px] sm:h-[170px] overflow-hidden">
+      <div className="relative w-55 sm:w-70 h-33.75 sm:h-42.5 overflow-hidden">
         <ResponsiveContainer width="100%" height={280}>
           <PieChart>
             <Pie
@@ -26,9 +26,6 @@ const UsersByDevice = () => (
               stroke="none"
               cornerRadius={4}
             >
-              {data.map((entry, i) => (
-                <Cell key={i} fill={entry.color} />
-              ))}
             </Pie>
           </PieChart>
         </ResponsiveContainer>
@@ -45,7 +42,7 @@ const UsersByDevice = () => (
       {data.map((item) => (
         <div key={item.name} className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.fill }} />
             <span className="text-[12px] sm:text-[13px] text-[#94a3b8]">{item.name}</span>
           </div>
           <span className="text-[12px] sm:text-[13px] font-semibold text-white">{item.value.toLocaleString()}</span>

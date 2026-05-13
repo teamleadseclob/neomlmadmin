@@ -102,8 +102,8 @@ const Announcements = () => (
     <h2 className="text-[16px] sm:text-[18px] font-bold text-white mb-5">Current Announcements</h2>
 
     <div className="flex flex-col gap-4">
-      {announcements.map((a, i) => (
-        <div key={i} className="rounded-2xl border border-[#1e293b] bg-[#0b1120] p-4 sm:p-5 flex gap-3 sm:gap-4">
+      {announcements.map((a) => (
+        <div key={a.title} className="rounded-2xl border border-[#1e293b] bg-[#0b1120] p-4 sm:p-5 flex gap-3 sm:gap-4">
           {/* Thumbnail */}
           <img src={a.image} alt="" className="w-12.5 h-12.5 sm:w-15 sm:h-15 rounded-lg object-cover shrink-0 mt-1" />
 

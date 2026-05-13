@@ -86,7 +86,7 @@ const WebsitePromotions = () => (
     </div>
 
     {/* Create New Promotion Button */}
-    <button className="w-full mt-5 py-3 rounded-xl bg-gradient-to-r from-[#10b981] to-[#34d399] text-[#021a12] text-[13px] font-bold hover:from-[#34d399] hover:to-[#6ee7b7] transition-all cursor-pointer shadow-lg shadow-[#10b981]/25 flex items-center justify-center gap-2">
+    <button className="w-full mt-5 py-3 rounded-xl bg-linear-to-r from-[#10b981] to-[#34d399] text-[#021a12] text-[13px] font-bold hover:from-[#34d399] hover:to-[#6ee7b7] transition-all cursor-pointer shadow-lg shadow-[#10b981]/25 flex items-center justify-center gap-2">
       <HiOutlineSparkles /> Create New Promotion
     </button>
   </div>

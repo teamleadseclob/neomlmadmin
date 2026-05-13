@@ -57,7 +57,7 @@ const Login = () => {
       </div>
 
       <div className="relative z-10 min-h-screen flex items-center justify-center">
-        <div className="w-[90%] max-w-[500px] rounded-2xl px-6 py-8 sm:px-10 sm:py-10 border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] backdrop-blur-[24px] shadow-[0_0_80px_rgba(45,212,168,0.08),inset_0_1px_0_rgba(255,255,255,0.06)]">
+        <div className="w-[90%] max-w-125 rounded-2xl px-6 py-8 sm:px-10 sm:py-10 border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] backdrop-blur-xl shadow-[0_0_80px_rgba(45,212,168,0.08),inset_0_1px_0_rgba(255,255,255,0.06)]">
           <h2 className="text-white text-[28px] font-bold text-center mb-2">
             Welcome back!
           </h2>
@@ -72,7 +72,7 @@ const Login = () => {
           )}
 
           <form onSubmit={handleLogin}>
-            <label className="text-white text-[13px] font-medium block mb-2">
+            <label htmlFor="User ID" className="text-white text-[13px] font-medium block mb-2">
               User ID
             </label>
             <input
@@ -80,10 +80,10 @@ const Login = () => {
               placeholder="Enter user ID"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
-              className="w-full h-[48px] rounded-xl px-4 text-[14px] text-white bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] outline-none mb-5 focus:border-[rgba(45,212,168,0.4)] transition"
+              className="w-full h-12 rounded-xl px-4 text-[14px] text-white bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] outline-none mb-5 focus:border-[rgba(45,212,168,0.4)] transition"
             />
 
-            <label className="text-white text-[13px] font-medium block mb-2">
+            <label htmlFor="Password" className="text-white text-[13px] font-medium block mb-2">
               Password
             </label>
             <div className="relative mb-5">
@@ -92,7 +92,7 @@ const Login = () => {
                 placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-[48px] rounded-xl px-4 pr-12 text-[14px] text-white bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] outline-none focus:border-[rgba(45,212,168,0.4)] transition"
+                className="w-full h-12 rounded-xl px-4 pr-12 text-[14px] text-white bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] outline-none focus:border-[rgba(45,212,168,0.4)] transition"
               />
               <button
                 type="button"
@@ -104,10 +104,11 @@ const Login = () => {
             </div>
 
             <div className="flex items-center justify-between mb-7">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <span
+              <label htmlFor="Remember Me" className="flex items-center gap-2 cursor-pointer select-none">
+                <button
+                  type="button"
                   onClick={() => setRemember(!remember)}
-                  className="w-[18px] h-[18px] rounded-[4px] flex items-center justify-center shrink-0"
+                  className="w-4.5 h-4.5 rounded-sm flex items-center justify-center shrink-0 border-none p-0 cursor-pointer"
                   style={{
                     background: remember
                       ? "linear-gradient(135deg, #0d9b7a, #2dd4a8)"
@@ -128,35 +129,35 @@ const Login = () => {
                       />
                     </svg>
                   )}
-                </span>
+                </button>
                 <span className="text-white text-[13px]">Remember Me</span>
               </label>
-              <a
-                href="#"
-                className="text-[#2dd4a8] text-[13px] no-underline hover:underline"
+              <button
+                type="button"
+                className="text-[#2dd4a8] text-[13px] no-underline hover:underline bg-transparent border-none p-0 cursor-pointer"
               >
                 Forgot Password?
-              </a>
+              </button>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-[48px] rounded-xl border-none text-[15px] font-semibold cursor-pointer text-[#021a12] bg-gradient-to-r from-[#0a8c6a] to-[#2dd4a8] shadow-[0_4px_24px_rgba(45,212,168,0.25)] mb-6 disabled:opacity-60"
+              className="w-full h-12 rounded-xl border-none text-[15px] font-semibold cursor-pointer text-[#021a12] bg-linear-to-r from-[#0a8c6a] to-[#2dd4a8] shadow-[0_4px_24px_rgba(45,212,168,0.25)] mb-6 disabled:opacity-60"
             >
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
 
           <p className="text-[#6a7a7a] text-[12px] text-center m-0">
-            By continuing, you agree to AssetLoop's{" "}
-            <a href="#" className="text-white font-semibold underline">
+            By continuing, you agree to NeoFi{" "}
+            <button type="button" className="text-white font-semibold underline bg-transparent border-none p-0 cursor-pointer">
               Terms of Service
-            </a>{" "}
+            </button>{" "}
             and{" "}
-            <a href="#" className="text-white font-semibold underline">
+            <button type="button" className="text-white font-semibold underline bg-transparent border-none p-0 cursor-pointer">
               Privacy Policy
-            </a>
+            </button>
           </p>
         </div>
       </div>

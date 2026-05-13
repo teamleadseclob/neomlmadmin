@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+
 import { HiOutlineUserAdd } from "react-icons/hi"
 import { BsClipboardData, BsGrid } from "react-icons/bs"
 import { TbChartBar, TbArrowsExchange } from "react-icons/tb"
@@ -9,8 +10,9 @@ import { MdOutlinePendingActions, MdOutlinePaid } from "react-icons/md"
 import { GiTwoCoins } from "react-icons/gi"
 import { getDashboardDataApi } from "../../api/dashboardApi"
 
+// eslint-disable-next-line react/prop-types
 const StatCard = ({ icon, label, value, todayLabel = "TODAY", todayValue }) => (
-  <div className="rounded-2xl border-1 border-[#737c7a]/50 bg-[#0a1018] p-6 sm:p-7 flex flex-col justify-between min-h-[160px] sm:min-h-[175px] shadow-[0_0_30px_rgba(109,119,116,0.35)] transition-all duration-300 hover:bg-gradient-to-br hover:from-[#0f2a1f] hover:to-[#0a1a14] hover:border-[#14CA74]/60 cursor-pointer">
+  <div className="rounded-2xl border border-[#737c7a]/50 bg-[#0a1018] p-6 sm:p-7 flex flex-col justify-between min-h-40 sm:min-h-43.75 shadow-[0_0_30px_rgba(109,119,116,0.35)] transition-all duration-300 hover:bg-linear-to-br hover:from-[#0f2a1f] hover:to-[#0a1a14] hover:border-[#14CA74]/60 cursor-pointer">
     <div className="flex items-start justify-between">
       <div className="w-14 h-14 rounded-xl bg-[#0f1a24] border border-[#1a2a3a] flex items-center justify-center text-[#14CA74] text-2xl">
         {icon}
@@ -80,15 +82,18 @@ const DashboardContent = () => {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-4 sm:mb-5">
-        {cardConfig.map(({ key, icon, label, prefix, hasToday }) => (
-          <StatCard
-            key={key}
-            icon={icon}
-            label={label}
-            value={data ? fmt(hasToday ? data[key]?.total : data[key], prefix) : "--"}
-            todayValue={data && hasToday ? fmt(data[key]?.today, prefix) : "--"}
-          />
-        ))}
+        {cardConfig.map(({ key, icon, label, prefix, hasToday }) => {
+          const rawValue = hasToday ? data?.[key]?.total : data?.[key]
+          return (
+            <StatCard
+              key={key}
+              icon={icon}
+              label={label}
+              value={data ? fmt(rawValue, prefix) : "--"}
+              todayValue={data && hasToday ? fmt(data[key]?.today, prefix) : "--"}
+            />
+          )
+        })}
       </div>
 
 

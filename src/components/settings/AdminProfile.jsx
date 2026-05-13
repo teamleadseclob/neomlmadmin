@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { IoSettingsOutline, IoNotificationsOutline, IoSearchOutline } from "react-icons/io5"
+import {IoSearchOutline } from "react-icons/io5"
 import { HiOutlineUser } from "react-icons/hi"
 
 const AdminProfile = () => {
@@ -51,7 +51,7 @@ const AdminProfile = () => {
           <div className="flex-1 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] font-bold tracking-wider text-[#64748b] uppercase mb-2 block">Full Name</label>
+                <label htmlFor="Full Name" className="text-[10px] font-bold tracking-wider text-[#64748b] uppercase mb-2 block">Full Name</label>
                 <input
                   type="text"
                   value={profile.fullName}
@@ -60,7 +60,7 @@ const AdminProfile = () => {
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold tracking-wider text-[#64748b] uppercase mb-2 block">Admin Role</label>
+                <label htmlFor="Admin Role"  className="text-[10px] font-bold tracking-wider text-[#64748b] uppercase mb-2 block">Admin Role</label>
                 <input
                   type="text"
                   value={profile.adminRole}
@@ -70,7 +70,7 @@ const AdminProfile = () => {
               </div>
             </div>
             <div>
-              <label className="text-[10px] font-bold tracking-wider text-[#64748b] uppercase mb-2 block">Email Address</label>
+              <label htmlFor="Email Address" className="text-[10px] font-bold tracking-wider text-[#64748b] uppercase mb-2 block">Email Address</label>
               <input
                 type="email"
                 value={profile.email}

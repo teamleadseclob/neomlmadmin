@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { BarChart, Bar, XAxis, ResponsiveContainer } from "recharts"
-import { IoTrendingUp } from "react-icons/io5"
 import { TbChartBar } from "react-icons/tb"
 import { getusercharts } from "../../api/dashboardApi"
 
@@ -35,7 +34,7 @@ const TotalProfitChart = () => {
           <span className="text-[20px] sm:text-[24px] font-bold text-white">{totalUsers}</span>
         </div>
       </div>
-      <div className="flex-1 mt-3 min-h-[120px]">
+      <div className="flex-1 mt-3 min-h-30">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} barSize={6}>
             <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#475569", fontSize: 9 }} />

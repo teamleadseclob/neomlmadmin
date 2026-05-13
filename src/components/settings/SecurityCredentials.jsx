@@ -17,7 +17,7 @@ const SecurityCredentials = () => {
 
       <div className="space-y-4">
         <div>
-          <label className="text-[10px] font-bold tracking-wider text-[#64748b] uppercase mb-2 block">Current Password</label>
+          <label htmlFor="current" className="text-[10px] font-bold tracking-wider text-[#64748b] uppercase mb-2 block">Current Password</label>
           <input
             type="password"
             value={passwords.current}
@@ -26,7 +26,7 @@ const SecurityCredentials = () => {
           />
         </div>
         <div>
-          <label className="text-[10px] font-bold tracking-wider text-[#64748b] uppercase mb-2 block">New Password</label>
+          <label htmlFor="newPassword" className="text-[10px] font-bold tracking-wider text-[#64748b] uppercase mb-2 block">New Password</label>
           <input
             type="password"
             value={passwords.newPassword}
@@ -36,7 +36,7 @@ const SecurityCredentials = () => {
           />
         </div>
         <div>
-          <label className="text-[10px] font-bold tracking-wider text-[#64748b] uppercase mb-2 block">Confirm New Password</label>
+          <label htmlFor="confirmPassword" className="text-[10px] font-bold tracking-wider text-[#64748b] uppercase mb-2 block">Confirm New Password</label>
           <input
             type="password"
             value={passwords.confirmPassword}

@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react"
+import PropTypes from "prop-types"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { IoTrendingUp } from "react-icons/io5"
 import { getRevenueChartApi } from "../../api/dashboardApi"
 
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = (props) => {
+  const { active, payload, label } = props
   if (active && payload?.length) {
     return (
       <div className="bg-[#0d1321] border border-[#1e293b] rounded-lg px-3 py-2">
@@ -13,6 +15,12 @@ const CustomTooltip = ({ active, payload, label }) => {
     )
   }
   return null
+}
+
+CustomTooltip.propTypes = {
+  active: PropTypes.bool,
+  payload: PropTypes.array,
+  label: PropTypes.string,
 }
 
 const formatTotal = (val) => {
@@ -65,7 +73,7 @@ const RevenueChart = () => {
           </select>
         </div>
       </div>
-      <div className="flex-1 min-h-[200px]">
+      <div className="flex-1 min-h-50">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 20, right: 10, left: -10, bottom: 0 }}>
             <defs>

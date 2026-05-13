@@ -12,9 +12,11 @@ const Layout = () => {
     <div className="flex min-h-screen bg-[#0a0f1e] text-white">
       {/* Mobile Overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm"
+        <button
+          type="button"
+          className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm border-none cursor-default"
           onClick={() => setSidebarOpen(false)}
+          aria-label="Close sidebar"
         />
       )}
 
@@ -22,7 +24,7 @@ const Layout = () => {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onLogout={() => setShowLogout(true)} />
 
       {/* Main Content */}
-      <main className="lg:ml-[240px] flex-1 p-4 sm:p-6 lg:p-8 min-w-0 relative">
+      <main className="lg:ml-60 flex-1 p-4 sm:p-6 lg:p-8 min-w-0 relative">
         {/* Mobile Header */}
         <button
           onClick={() => setSidebarOpen(true)}

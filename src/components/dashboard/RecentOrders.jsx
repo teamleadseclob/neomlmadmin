@@ -20,7 +20,7 @@ const RecentOrders = () => {
 
       {/* Table - Scrollable on small screens */}
       <div className="overflow-x-auto -mx-4 sm:-mx-6 px-4 sm:px-6">
-        <table className="w-full min-w-[500px]">
+        <table className="w-full min-w-125">
           <thead>
             <tr className="text-[10px] sm:text-[11px] text-[#94a3b8] uppercase tracking-wider">
               <th className="text-left pb-3 font-medium w-[30%]"><span className="flex items-center gap-2">☑ User</span></th>
