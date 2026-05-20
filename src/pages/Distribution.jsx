@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   FiSettings, FiBell, FiCalendar,
   FiChevronLeft, FiChevronRight,
-  FiFilter, FiEdit3, FiX
+  FiFilter, FiEdit3, FiX, FiPlus
 } from 'react-icons/fi';
 import { BsFiletypePdf } from 'react-icons/bs';
 import jsPDF from 'jspdf';
@@ -23,6 +23,9 @@ const Distribution = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [distributing, setDistributing] = useState(false);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('roi');
+  const [addModal, setAddModal] = useState({ open: false, type: '' });
+  const [addValue, setAddValue] = useState('0.00');
 
   React.useEffect(() => {
     const fetchDistributionData = async () => {
@@ -153,55 +156,58 @@ const Distribution = () => {
         </div>
       )}
 
-      {/* ROI Distribution Card */}
-      <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      {/* 3 Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* ROI Distribution Card */}
+        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 flex flex-col justify-between">
           <div>
-            <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-1">ROI Distribution</p>
-            {isEditing ? (
-              <div className="flex items-center gap-2 mt-1">
-                <input
-                  type="number"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  className="w-20 px-2 py-1 bg-[#0a0f1e] border border-[#1e293b] rounded text-white text-[16px] font-bold outline-none focus:border-[#25c3a3]"
-                />
-                <span className="text-white font-bold">%</span>
-              </div>
-            ) : (
-              <p className="text-[20px] font-extrabold text-white tracking-tight">{roiDistributionData?.dailyRoiPercentage}%</p>
-            )}
+            <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">ROI Distribution</p>
+            <p className="text-[24px] font-extrabold text-white tracking-tight">$14,290,551.42</p>
           </div>
-          {isEditing ? (
-            <div className="flex gap-2">
-              <button
-                onClick={handleUpdateROI}
-                className="px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer bg-[#25c3a3] text-[#0a0f1e] hover:bg-[#25c3a3]/80 transition-colors"
-              >
-                Save
-              </button>
-              <button
-                onClick={() => setIsEditing(false)}
-                className="px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border border-gray-600 text-gray-300 hover:border-gray-400 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={handleEditROI}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3]/50 text-[#25c3a3] hover:border-[#25c3a3] transition-colors"
-            >
-              <FiEdit3 className="w-3.5 h-3.5" />
-              Edit ROI
-            </button>
-          )}
+          <button onClick={() => { setAddModal({ open: true, type: 'roi' }); setAddValue('0.00'); }} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+            <FiPlus className="w-3.5 h-3.5" />
+            Add ROI
+          </button>
         </div>
+
+        {/* Pool Distribution Card */}
+        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 flex flex-col justify-between">
+          <div>
+            <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">Pool Distribution</p>
+            <p className="text-[24px] font-extrabold text-white tracking-tight">$14,290,551.42</p>
+          </div>
+          <button onClick={() => { setAddModal({ open: true, type: 'pool' }); setAddValue('0.00'); }} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+            <FiPlus className="w-3.5 h-3.5" />
+            Add Pool Reward
+          </button>
+        </div>
+
+        {/* Multi Reward Distribution Card */}
+        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 flex flex-col justify-between">
+          <div>
+            <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">Multi Reward Distribution</p>
+            <p className="text-[24px] font-extrabold text-white tracking-tight">$248,310.00</p>
+          </div>
+          <button onClick={() => { setAddModal({ open: true, type: 'multi' }); setAddValue('0.00'); }} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+            <FiPlus className="w-3.5 h-3.5" />
+            Add Multi Reward
+          </button>
+        </div>
+      </div>
+
+      {/* Tab Buttons */}
+      <div className="flex items-center justify-center gap-0">
         <button
-          onClick={() => setShowConfirmModal(true)}
-          className="px-5 py-2.5 rounded-lg text-[13px] font-bold cursor-pointer bg-[#00e396] text-[#0a0f1e] hover:bg-[#00e396]/80 transition-colors"
+          onClick={() => setActiveTab('roi')}
+          className={`px-6 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer transition-colors ${activeTab === 'roi' ? 'bg-[#1e293b] text-white' : 'text-gray-400 hover:text-gray-200'}`}
         >
-          Distribute ROI
+          ROI Distribution
+        </button>
+        <button
+          onClick={() => setActiveTab('multi')}
+          className={`px-6 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer transition-colors ${activeTab === 'multi' ? 'bg-[#1e293b] text-white' : 'text-gray-400 hover:text-gray-200'}`}
+        >
+          Multi Reward Distribution
         </button>
       </div>
 
@@ -232,15 +238,14 @@ const Distribution = () => {
         </div>
       </div>
 
-      {/* ROI Distribution History Table */}
+      {/* Distribution History Table */}
       <div className="bg-[#0f1522] border border-[#2d3a4f] rounded-[14px] overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
         <div className="overflow-x-auto">
-          <div className="grid grid-cols-[0.5fr_1.2fr_0.8fr_1.2fr_0.6fr] gap-4 px-6 py-4 text-[10px] font-bold tracking-[0.12em] text-gray-400 uppercase border-b border-[#2d3a4f] bg-[#0a0f1e]/60 min-w-162.5">
+          <div className="grid grid-cols-[0.8fr_2fr_1.5fr_1fr] gap-4 px-6 py-4 text-[10px] font-bold tracking-[0.12em] text-gray-400 uppercase border-b border-[#2d3a4f] bg-[#0a0f1e]/60">
             <span>SL. NO</span>
             <span>Date & Time</span>
-            <span className="text-center">Users Earned</span>
-            <span className="text-center">Total ROI Distributed</span>
-            <span className="text-right">ROI %</span>
+            <span className="text-center">{activeTab === 'roi' ? 'Total ROI' : 'Total Reward'}</span>
+            <span className="text-right">Status</span>
           </div>
 
           {history.length === 0 ? (
@@ -249,7 +254,7 @@ const Distribution = () => {
             history.map((row, idx) => (
               <div
                 key={row._id}
-                className="grid grid-cols-[0.5fr_1.2fr_0.8fr_1.2fr_0.6fr] gap-4 px-6 py-4 items-center border-b border-[#2d3a4f]/60 hover:bg-[#1a2435] transition-colors min-w-162.5"
+                className="grid grid-cols-[0.8fr_2fr_1.5fr_1fr] gap-4 px-6 py-5 items-center border-b border-[#2d3a4f]/60 hover:bg-[#1a2435] transition-colors"
               >
                 <span className="text-[13px] font-semibold text-gray-400">
                   {String((currentPage - 1) * limit + idx + 1).padStart(2, '0')}
@@ -259,16 +264,15 @@ const Distribution = () => {
                     {new Date(row.distributedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
                   </p>
                   <p className="text-[10px] text-gray-500 font-medium mt-0.5">
-                    {new Date(row.distributedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    {new Date(row.distributedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} UTC
                   </p>
                 </div>
-                <p className="text-[14px] font-bold text-white text-center">{row.totalUsersEarned}</p>
-                <p className="text-[14px] font-bold text-[#00e396] text-center tracking-tight">
-                  ${row.totalRoiDistributed.toLocaleString()}
+                <p className="text-[14px] font-bold text-white text-center">
+                  {row.totalRoiDistributed?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
                 <div className="text-right">
-                  <span className="inline-block px-3 py-1.5 rounded-md text-[11px] font-bold tracking-wide text-[#00e396] bg-[#00e396]/10 border border-[#00e396]/20">
-                    {row.roiPercentage}%
+                  <span className="inline-block px-3 py-1.5 rounded text-[10px] font-bold tracking-wide text-[#00e396] bg-[#00e396]/15">
+                    COMPLETED
                   </span>
                 </div>
               </div>
@@ -330,27 +334,47 @@ const Distribution = () => {
           </div>
         </div>
       </div>
-      {/* ROI Distribution Confirmation Modal */}
-      {showConfirmModal && (
+      {/* Add Modal */}
+      {addModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-6 w-full max-w-sm mx-4">
-            <h3 className="text-[18px] font-bold text-white mb-2">Confirm ROI Distribution</h3>
-            <p className="text-[13px] text-gray-400 mb-6">
-              Are you sure you want to distribute ROI to all eligible users? This action cannot be undone.
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-[20px] font-bold text-white">
+                {addModal.type === 'roi' && 'Add ROI'}
+                {addModal.type === 'pool' && 'Add Pool Reward'}
+                {addModal.type === 'multi' && 'Add Multi Reward'}
+              </h3>
+              <button onClick={() => setAddModal({ open: false, type: '' })} className="text-gray-400 hover:text-white cursor-pointer">
+                <FiX className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-[13px] text-gray-400 mb-5">
+              Enter the percentage distribution value for the current {addModal.type === 'roi' ? 'ROI' : addModal.type === 'pool' ? 'Pool Reward' : 'Multi Reward'} cycle.
             </p>
-            <div className="flex gap-3 justify-end">
+            <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">
+              {addModal.type === 'roi' ? 'ROI' : addModal.type === 'pool' ? 'Pool Reward' : 'Multi Reward'} Percentage
+            </p>
+            <div className="flex items-center bg-[#0a0f1e] border border-[#1e293b] rounded-lg px-4 py-3 mb-6">
+              <input
+                type="number"
+                value={addValue}
+                onChange={(e) => setAddValue(e.target.value)}
+                className="flex-1 bg-transparent text-white text-[16px] font-bold outline-none"
+              />
+              <span className="text-gray-400 font-bold text-[16px]">%</span>
+            </div>
+            <div className="flex gap-3">
               <button
-                onClick={() => setShowConfirmModal(false)}
-                className="px-4 py-2 rounded-lg text-[12px] font-bold cursor-pointer border border-gray-600 text-gray-300 hover:border-gray-400 transition-colors"
+                onClick={() => setAddModal({ open: false, type: '' })}
+                className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer border border-[#1e293b] text-gray-300 hover:border-gray-400 transition-colors"
               >
-                Cancel
+                Close
               </button>
               <button
-                onClick={handleDistributeROI}
-                disabled={distributing}
-                className="px-4 py-2 rounded-lg text-[12px] font-bold cursor-pointer bg-[#00e396] text-[#0a0f1e] hover:bg-[#00e396]/80 transition-colors disabled:opacity-50"
+                onClick={() => { handleDistributeROI(); setAddModal({ open: false, type: '' }); }}
+                className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer bg-[#25c3a3] text-[#0a0f1e] hover:bg-[#25c3a3]/80 transition-colors"
               >
-                {distributing ? 'Distributing...' : 'Confirm'}
+                Submit
               </button>
             </div>
           </div>

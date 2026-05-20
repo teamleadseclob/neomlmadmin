@@ -12,3 +12,6 @@ export const mlrlist = async () => {
 
 export const mlrUpdate = async (level, data) => {
     return axiosInstance.patch(`/api/admin/multilevel-rewards/config/${level}`, data)};
+
+export const swpPackages = async () => {
+    return axiosInstance.get("/api/admin/swp/packages")};

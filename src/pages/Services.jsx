@@ -16,6 +16,7 @@ const Services = () => {
     campaignTitle: 'Quantum Observatory Cup',
     subTitle: 'Quantum Observatory Cup',
     description: '',
+    mediaUrl: '',
     startDate: '',
     endDate: '',
   });
@@ -23,20 +24,23 @@ const Services = () => {
   // Learning Packages form state
   const [learningForm, setLearningForm] = useState({
     packageName: '',
-    category: 'Cryptocurrency Basics',
+    category: 'cryptocurrency_basics',
     description: '',
+    mediaUrl: '',
     price: '',
     duration: '',
-    accessLevel: 'All Members',
+    accessLevel: 'all_members',
+    status: 'active',
   });
 
   // Tools form state
   const [toolsForm, setToolsForm] = useState({
     toolName: '',
-    toolType: 'Calculator',
+    toolType: 'analytics',
     description: '',
-    accessLevel: 'All Members',
-    status: 'Active',
+    mediaUrl: '',
+    accessLevel: 'all_members',
+    status: 'active',
   });
 
   const handleContestChange = (field, value) => {
@@ -176,6 +180,20 @@ const Services = () => {
 
 
 
+          {/* Media URL */}
+          <div className="mb-6">
+            <label htmlFor='Media URL' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              Media URL
+            </label>
+            <input
+              type="text"
+              value={contestForm.mediaUrl}
+              onChange={(e) => handleContestChange('mediaUrl', e.target.value)}
+              className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors"
+              placeholder="e.g. https://youtube.com/watch?v=abc"
+            />
+          </div>
+
           {/* Background Image Upload */}
           <div className="mb-6">
             <label htmlFor='Background Image' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
@@ -256,20 +274,21 @@ const Services = () => {
             <button
               onClick={async () => {
                 const payload = {
-                  title: contestForm.campaignTitle,
-                  description: contestForm.description,
                   type: 'contest',
-                  mediaUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
-                  expiryDays: contestForm.startDate && contestForm.endDate
-                    ? Math.ceil((new Date(contestForm.endDate) - new Date(contestForm.startDate)) / 86400000)
-                    : 30,
+                  title: contestForm.campaignTitle,
+                  subTitle: contestForm.subTitle,
+                  description: contestForm.description,
+                  imageUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
+                  mediaUrl: contestForm.mediaUrl,
+                  startDate: contestForm.startDate ? new Date(contestForm.startDate).toISOString() : '',
+                  endDate: contestForm.endDate ? new Date(contestForm.endDate).toISOString() : '',
                 };
                 try {
                   await createEvent(payload);
                   alert('Campaign deployed successfully!');
                 } catch (err) {
-                  console.error('Deploy campaign failed:', err);
-                  alert('Failed to deploy campaign');
+                  const msg = err.response?.data?.message || 'Failed to deploy campaign';
+                  alert(msg);
                 }
               }}
               className="px-6 py-3 bg-[#ef4444] hover:bg-[#dc2626] rounded-lg text-[13px] font-bold text-white transition-colors cursor-pointer shadow-[0_0_16px_rgba(239,68,68,0.2)]"
@@ -315,10 +334,10 @@ const Services = () => {
                 onChange={(e) => handleLearningChange('category', e.target.value)}
                 className="appearance-none w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white focus:outline-none focus:border-[#25c3a3]/50 transition-colors cursor-pointer"
               >
-                <option>Cryptocurrency Basics</option>
-                <option>Advanced Trading</option>
-                <option>Network Marketing</option>
-                <option>Financial Literacy</option>
+                <option value="cryptocurrency_basics">Cryptocurrency Basics</option>
+                <option value="advanced_trading">Advanced Trading</option>
+                <option value="network_marketing">Network Marketing</option>
+                <option value="financial_literacy">Financial Literacy</option>
               </select>
               <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
             </div>
@@ -335,6 +354,20 @@ const Services = () => {
               rows={4}
               className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors resize-none"
               placeholder="Enter the description"
+            />
+          </div>
+
+          {/* Media URL */}
+          <div className="mb-6">
+            <label htmlFor='Media URL' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              Media URL
+            </label>
+            <input
+              type="text"
+              value={learningForm.mediaUrl}
+              onChange={(e) => handleLearningChange('mediaUrl', e.target.value)}
+              className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors"
+              placeholder="e.g. https://youtube.com/watch?v=abc"
             />
           </div>
 
@@ -406,23 +439,42 @@ const Services = () => {
             </div>
           </div>
 
-          {/* Access Level */}
-          <div className="mb-8">
-            <label htmlFor='AccessLevel' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
-              Access Level
-            </label>
-            <div className="relative">
-              <select
-                id='AccessLevel'
-                value={learningForm.accessLevel}
-                onChange={(e) => handleLearningChange('accessLevel', e.target.value)}
-                className="appearance-none w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white focus:outline-none focus:border-[#25c3a3]/50 transition-colors cursor-pointer"
-              >
-                <option>All Members</option>
-                <option>VIP Members Only</option>
-                <option>Premium Tier</option>
-              </select>
-              <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+          {/* Access Level & Status */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div>
+              <label htmlFor='AccessLevel' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+                Access Level
+              </label>
+              <div className="relative">
+                <select
+                  id='AccessLevel'
+                  value={learningForm.accessLevel}
+                  onChange={(e) => handleLearningChange('accessLevel', e.target.value)}
+                  className="appearance-none w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white focus:outline-none focus:border-[#25c3a3]/50 transition-colors cursor-pointer"
+                >
+                  <option value="all_members">All Members</option>
+                  <option value="vip_members_only">VIP Members Only</option>
+                  <option value="premium_members">Premium Members</option>
+                </select>
+                <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+              </div>
+            </div>
+            <div>
+              <label htmlFor='Status' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+                Status
+              </label>
+              <div className="relative">
+                <select
+                  value={learningForm.status}
+                  onChange={(e) => handleLearningChange('status', e.target.value)}
+                  className="appearance-none w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white focus:outline-none focus:border-[#25c3a3]/50 transition-colors cursor-pointer"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="draft">Draft</option>
+                </select>
+                <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+              </div>
             </div>
           </div>
 
@@ -434,22 +486,23 @@ const Services = () => {
             <button
               onClick={async () => {
                 const payload = {
-                  title: learningForm.packageName,
-                  description: learningForm.description,
                   type: 'learning_package',
-                  mediaUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
-                  expiryDays: Number.parseInt(learningForm.duration) || 30,
+                  packageName: learningForm.packageName,
                   category: learningForm.category,
-                  price: learningForm.price,
+                  description: learningForm.description,
+                  imageUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
+                  mediaUrl: learningForm.mediaUrl,
+                  price: Number(learningForm.price) || 0,
                   duration: learningForm.duration,
                   accessLevel: learningForm.accessLevel,
+                  status: learningForm.status,
                 };
                 try {
                   await createEvent(payload);
                   alert('Package published successfully!');
                 } catch (err) {
-                  console.error('Publish package failed:', err);
-                  alert('Failed to publish package');
+                  const msg = err.response?.data?.message || 'Failed to publish package';
+                  alert(msg);
                 }
               }}
               className="px-6 py-3 bg-[#25c3a3] hover:bg-[#1fae91] rounded-lg text-[13px] font-bold text-white transition-colors cursor-pointer shadow-[0_0_16px_rgba(37,195,163,0.2)]"
@@ -496,10 +549,10 @@ const Services = () => {
                 onChange={(e) => handleToolsChange('toolType', e.target.value)}
                 className="appearance-none w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white focus:outline-none focus:border-[#25c3a3]/50 transition-colors cursor-pointer"
               >
-                <option>Calculator</option>
-                <option>Analytics Widget</option>
-                <option>Report Generator</option>
-                <option>Data Exporter</option>
+                <option value="calculator">Calculator</option>
+                <option value="analytics">Analytics Widget</option>
+                <option value="report_generator">Report Generator</option>
+                <option value="data_exporter">Data Exporter</option>
               </select>
               <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
             </div>
@@ -516,6 +569,20 @@ const Services = () => {
               rows={4}
               className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors resize-none"
               placeholder="Enter the description"
+            />
+          </div>
+
+          {/* Media URL */}
+          <div className="mb-6">
+            <label htmlFor='Tool Media URL' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              Media URL
+            </label>
+            <input
+              type="text"
+              value={toolsForm.mediaUrl}
+              onChange={(e) => handleToolsChange('mediaUrl', e.target.value)}
+              className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors"
+              placeholder="e.g. https://youtube.com/watch?v=abc"
             />
           </div>
 
@@ -571,9 +638,9 @@ const Services = () => {
                   onChange={(e) => handleToolsChange('accessLevel', e.target.value)}
                   className="appearance-none w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white focus:outline-none focus:border-[#25c3a3]/50 transition-colors cursor-pointer"
                 >
-                  <option>All Members</option>
-                  <option>VIP Members Only</option>
-                  <option>Admin Only</option>
+                  <option value="all_members">All Members</option>
+                  <option value="vip_members_only">VIP Members Only</option>
+                  <option value="premium_members">Premium Members</option>
                 </select>
                 <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
               </div>
@@ -588,9 +655,9 @@ const Services = () => {
                   onChange={(e) => handleToolsChange('status', e.target.value)}
                   className="appearance-none w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white focus:outline-none focus:border-[#25c3a3]/50 transition-colors cursor-pointer"
                 >
-                  <option>Active</option>
-                  <option>Inactive</option>
-                  <option>Maintenance</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="maintenance">Maintenance</option>
                 </select>
                 <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
               </div>
@@ -605,12 +672,12 @@ const Services = () => {
             <button
               onClick={async () => {
                 const payload = {
-                  title: toolsForm.toolName,
-                  description: toolsForm.description,
                   type: 'tools',
-                  mediaUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
-                  expiryDays: 30,
+                  toolName: toolsForm.toolName,
                   toolType: toolsForm.toolType,
+                  description: toolsForm.description,
+                  imageUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
+                  mediaUrl: toolsForm.mediaUrl,
                   accessLevel: toolsForm.accessLevel,
                   status: toolsForm.status,
                 };
@@ -618,8 +685,8 @@ const Services = () => {
                   await createEvent(payload);
                   alert('Tool deployed successfully!');
                 } catch (err) {
-                  console.error('Failed to deploy tool:', err);
-                  alert('Failed to deploy tool');
+                  const msg = err.response?.data?.message || 'Failed to deploy tool';
+                  alert(msg);
                 }
               }}
               className="px-6 py-3 bg-[#25c3a3] hover:bg-[#1fae91] rounded-lg text-[13px] font-bold text-white transition-colors cursor-pointer shadow-[0_0_16px_rgba(37,195,163,0.2)]"

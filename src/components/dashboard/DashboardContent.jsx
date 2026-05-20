@@ -12,7 +12,7 @@ import { getDashboardDataApi } from "../../api/dashboardApi"
 
 // eslint-disable-next-line react/prop-types
 const StatCard = ({ icon, label, value, todayLabel = "TODAY", todayValue }) => (
-  <div className="rounded-2xl border border-[#737c7a]/50 bg-[#0a1018] p-6 sm:p-7 flex flex-col justify-between min-h-40 sm:min-h-43.75 shadow-[0_0_30px_rgba(109,119,116,0.35)] transition-all duration-300 hover:bg-linear-to-br hover:from-[#0f2a1f] hover:to-[#0a1a14] hover:border-[#14CA74]/60 cursor-pointer">
+  <div className="rounded-2xl border border-[#737c7a]/50 bg-[#0a1018] p-6 sm:p-7 flex flex-col justify-between min-h-40 sm:min-h-43.75 shadow-[0_0_10px_rgba(109,119,116,0.15)] transition-all duration-300 hover:bg-linear-to-br hover:from-[#0f2a1f] hover:to-[#0a1a14] hover:border-[#14CA74]/60 cursor-pointer">
     <div className="flex items-start justify-between">
       <div className="w-14 h-14 rounded-xl bg-[#0f1a24] border border-[#1a2a3a] flex items-center justify-center text-[#14CA74] text-2xl">
         {icon}

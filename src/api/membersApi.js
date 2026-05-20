@@ -12,6 +12,14 @@ export const unblockUser = async (id) => {
   return axiosInstance.patch(`/api/admin/users/${id}/unblock`);
 };
 
+export const changePassword = async (id, newPassword) => {
+  return axiosInstance.patch(`/api/admin/users/${id}/change-password`, { newPassword });
+};
+
+export const changeEmail = async (id, newEmail) => {
+  return axiosInstance.patch(`/api/admin/users/${id}/change-email`, { newEmail });
+};
+
 export const getTransactions = async (params = {}) => {
   return axiosInstance.get("/api/admin/transactions", { params });
 };
