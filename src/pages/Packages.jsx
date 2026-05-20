@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react"
-import { swplist, swpUpdate, mlrlist, mlrUpdate, swpPackages } from "../api/package"
+import { useParams } from "react-router-dom"
+import { swplist, swpUpdate, mlrlist, mlrUpdate, swpPackages, addUsdt } from "../api/package"
 import { FiEdit2, FiCheck, FiX } from "react-icons/fi"
 
 const Packages = () => {
-  const [activeTab, setActiveTab] = useState("SWP")
+  const { userId } = useParams()
+  const [activeTab, setActiveTab] = useState(userId ? "SWP_PKG" : "SWP")
   const [swpData, setSwpData] = useState([])
   const [mlrData, setMlrData] = useState([])
   const [swpPkgData, setSwpPkgData] = useState([])
@@ -11,6 +13,7 @@ const Packages = () => {
   const [swpForm, setSwpForm] = useState({ percentage: "" })
   const [mlrEditing, setMlrEditing] = useState(null)
   const [mlrForm, setMlrForm] = useState({ percentage: "", requiredRankOrder: "" })
+  const [fundModal, setFundModal] = useState({ open: false, package: null })
 
   const fetchData = () => {
     swplist().then((res) => setSwpData(res.data?.data || [])).catch(console.error)
@@ -168,6 +171,14 @@ const Packages = () => {
                     ${item.investmentLimit}
                   </span>
                 </div>
+                {userId && (
+                  <button
+                    onClick={() => setFundModal({ open: true, package: item })}
+                    className="w-full mt-2 py-2.5 rounded-lg bg-[#25c3a3]/15 border border-[#25c3a3]/30 text-[13px] font-bold text-[#25c3a3] hover:bg-[#25c3a3]/25 cursor-pointer transition-colors flex items-center justify-center gap-2"
+                  >
+                    Purchase
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -241,6 +252,46 @@ const Packages = () => {
             </div>
           ))}
       </div>
+
+      {/* Purchase Modal */}
+      {fundModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-[#1e293b] bg-[#0b1120] p-6">
+            <h2 className="text-[18px] font-bold text-white mb-1">Purchase Package</h2>
+            <p className="text-[13px] text-[#64748b] mb-5">Package Amount: <span className="text-[#25c3a3] font-bold">${fundModal.package?.amount}</span></p>
+            <div className="mb-5">
+              <label className="text-[12px] text-[#64748b] uppercase tracking-wider font-semibold mb-2 block">Amount</label>
+              <div className="w-full px-4 py-3 rounded-lg bg-[#080d1a] border border-[#1e293b] text-[16px] font-bold text-white">
+                ${fundModal.package?.amount}
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setFundModal({ open: false, package: null })}
+                className="flex-1 py-2.5 rounded-lg bg-[#1e293b] text-[13px] font-bold text-[#94a3b8] hover:text-white cursor-pointer transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  if (!userId) return
+                  try {
+                    await addUsdt(userId, fundModal.package.amount)
+                    alert("Package purchased successfully")
+                    setFundModal({ open: false, package: null })
+                  } catch (err) {
+                    alert(err.response?.data?.message || "Failed to purchase")
+                  }
+                }}
+                disabled={!userId}
+                className="flex-1 py-2.5 rounded-lg bg-[#25c3a3]/20 border border-[#25c3a3]/40 text-[13px] font-bold text-[#25c3a3] hover:bg-[#25c3a3]/30 cursor-pointer transition-colors disabled:opacity-50"
+              >
+                Purchase
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

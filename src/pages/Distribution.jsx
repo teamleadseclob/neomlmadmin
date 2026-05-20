@@ -7,7 +7,7 @@ import {
 import { BsFiletypePdf } from 'react-icons/bs';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { getDistributionData , updateRoiDistributionData, distributeRoi , getDistributionHistory} from '../api/distributionApi';
+import { getDistributionData , updateRoiDistributionData, distributeRoi , getDistributionHistory, distributePoolFund} from '../api/distributionApi';
 
 
 const Distribution = () => {
@@ -162,9 +162,9 @@ const Distribution = () => {
         <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 flex flex-col justify-between">
           <div>
             <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">ROI Distribution</p>
-            <p className="text-[24px] font-extrabold text-white tracking-tight">$14,290,551.42</p>
+            <p className="text-[24px] font-extrabold text-white tracking-tight">{roiDistributionData?.dailyRoiPercentage ?? 0}%</p>
           </div>
-          <button onClick={() => { setAddModal({ open: true, type: 'roi' }); setAddValue('0.00'); }} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+          <button onClick={() => { setAddModal({ open: true, type: 'roi' }); setAddValue(roiDistributionData?.dailyRoiPercentage || '0.00'); }} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
             <FiPlus className="w-3.5 h-3.5" />
             Add ROI
           </button>
@@ -371,7 +371,21 @@ const Distribution = () => {
                 Close
               </button>
               <button
-                onClick={() => { handleDistributeROI(); setAddModal({ open: false, type: '' }); }}
+                onClick={async () => {
+                  try {
+                    if (addModal.type === 'roi') {
+                      await updateRoiDistributionData({ dailyRoiPercentage: Number(addValue) });
+                      const res = await getDistributionData();
+                      setRoiDistributionData(res.data.data);
+                    } else if (addModal.type === 'pool') {
+                      await distributePoolFund({ percentage: Number(addValue) });
+                    }
+                    setAddModal({ open: false, type: '' });
+                  } catch (err) {
+                    setError(err.response?.data?.message || 'Failed to submit');
+                    setAddModal({ open: false, type: '' });
+                  }
+                }}
                 className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer bg-[#25c3a3] text-[#0a0f1e] hover:bg-[#25c3a3]/80 transition-colors"
               >
                 Submit

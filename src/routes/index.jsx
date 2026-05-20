@@ -14,6 +14,7 @@ import Closings from "../pages/Closings"
 import Tickets from "../pages/Tickets"
 import Subscribers from "../pages/Subscribers"
 import Settings from "../pages/Settings"
+import PushNotifications from "../pages/PushNotifications"
 import Login from "../pages/Login"
 
 const ProtectedRoute = ({ children }) => {
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
       { path: "/members/announcements", element: <Announcements /> },
       { path: "/members/blocked", element: <BlockedMembers /> },
       { path: "/packages", element: <Packages /> },
+      { path: "/packages/:userId", element: <Packages /> },
       { path: "/transactions", element: <Transactions /> },
       { path: "/reports", element: <Reports /> },
       { path: "/withdrawals", element: <Withdrawals /> },
@@ -44,6 +46,7 @@ const router = createBrowserRouter([
       { path: "/closings", element: <Closings /> },
       { path: "/tickets", element: <Tickets /> },
       { path: "/subscribers", element: <Subscribers /> },
+      { path: "/push-notifications", element: <PushNotifications /> },
       { path: "/settings", element: <Settings /> },
     ],
   },

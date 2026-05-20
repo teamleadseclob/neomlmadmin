@@ -24,3 +24,6 @@ export const getTransactions = async (params = {}) => {
   return axiosInstance.get("/api/admin/transactions", { params });
 };
 
+export const addUsdt = async (id, amount) => {
+  return axiosInstance.post(`/api/admin/users/${id}/add-usdt`, { amount });
+};

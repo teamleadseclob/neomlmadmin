@@ -34,6 +34,7 @@ const menuItems = [
   { name: "Distribution", path: "/distribution", icon: distributionIcon },
   { name: "Tickets", path: "/tickets", icon: ticketsIcon },
   { name: "Reports", path: "/reports", icon: reports },
+  { name: "Notifications", path: "/push-notifications", icon: ticketsIcon },
   // { name: "Subscribers", path: "/subscribers", icon: subscribersIcon },
   { name: "Settings", path: "/settings", icon: settingsIcon },
 ]

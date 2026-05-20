@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { IoDownloadOutline, IoSettingsOutline, IoNotificationsOutline, IoEyeOutline, IoEyeOffOutline, IoCloseOutline } from "react-icons/io5"
 import { FiSearch, FiChevronLeft, FiChevronRight, FiEdit2 } from "react-icons/fi"
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
-import {userlist, blockUser, unblockUser, changePassword, changeEmail } from "../api/membersApi"
+import {userlist, blockUser, unblockUser, changePassword, changeEmail, addUsdt } from "../api/membersApi"
 
 const AllMembers = () => {
+  const navigate = useNavigate()
   const [members, setMembers] = useState([])
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -232,7 +234,7 @@ const AllMembers = () => {
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-center gap-2">
                       <button onClick={() => { setFundMember(m); setShowAddFund(true); setFundAmount("") }} className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#25c3a3]/15 text-[#25c3a3] hover:bg-[#25c3a3]/25 transition-colors cursor-pointer whitespace-nowrap">ADD FUND</button>
-                      <button className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#3b82f6]/15 text-[#3b82f6] hover:bg-[#3b82f6]/25 transition-colors cursor-pointer whitespace-nowrap">ZERO PIN</button>
+                      <button onClick={() => navigate(`/packages/${m._id}`)} className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#3b82f6]/15 text-[#3b82f6] hover:bg-[#3b82f6]/25 transition-colors cursor-pointer whitespace-nowrap">ZERO PIN</button>
                       <button
                         onClick={() => { setViewMember(m); setShowLoginPass(false); setShowTxnPass(false) }}
                         className="w-8 h-8 rounded-full border border-[#2d3a4f] flex items-center justify-center text-[#94a3b8] hover:text-white hover:border-[#94a3b8] transition-colors cursor-pointer"
@@ -566,9 +568,11 @@ const AllMembers = () => {
                 onClick={async () => {
                   setFundLoading(true)
                   try {
+                    await addUsdt(fundMember._id, Number(fundAmount))
                     alert("Fund added successfully")
                     setShowAddFund(false)
                     setFundAmount("")
+                    fetchMembers()
                   } catch (err) {
                     alert(err.response?.data?.message || "Failed to add fund")
                   } finally {

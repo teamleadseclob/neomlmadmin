@@ -15,3 +15,6 @@ export const mlrUpdate = async (level, data) => {
 
 export const swpPackages = async () => {
     return axiosInstance.get("/api/admin/swp/packages")};
+
+export const addUsdt = async (userId, amount) => {
+    return axiosInstance.post(`/api/admin/users/${userId}/grant-swp`, { amount })};
