@@ -7,17 +7,20 @@ import {
 import { BsFiletypePdf } from 'react-icons/bs';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { getDistributionData , updateRoiDistributionData, distributeRoi , getDistributionHistory, distributePoolFund} from '../api/distributionApi';
+import { getDistributionData , updateRoiDistributionData, distributeRoi , getDistributionHistory, distributePoolFund, distributeMultiReward, getRankBonusHistory} from '../api/distributionApi';
+import { getDashboardDataApi } from '../api/dashboardApi';
 
 
 const Distribution = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [history, setHistory] = useState([]);
+  const [multiHistory, setMultiHistory] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalDocs, setTotalDocs] = useState(0);
   const limit = 10;
 
   const [roiDistributionData, setRoiDistributionData] = useState(null);
+  const [poolFund, setPoolFund] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -37,7 +40,17 @@ const Distribution = () => {
       }
     };
 
+    const fetchDashboardData = async () => {
+      try {
+        const res = await getDashboardDataApi();
+        setPoolFund(res.data?.data?.poolFund || 0);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
     fetchDistributionData();
+    fetchDashboardData();
   }, []);
 
   React.useEffect(() => {
@@ -54,8 +67,22 @@ const Distribution = () => {
         console.error(err);
       }
     };
-    fetchHistory();
-  }, [currentPage]);
+    const fetchMultiHistory = async () => {
+      try {
+        const res = await getRankBonusHistory({ page: currentPage, limit });
+        setMultiHistory(res.data?.data || []);
+        const pg = res.data?.pagination;
+        if (pg) {
+          setTotalPages(pg.totalPages);
+          setTotalDocs(pg.totalDocs);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    if (activeTab === 'roi') fetchHistory();
+    else fetchMultiHistory();
+  }, [currentPage, activeTab]);
 
   const handleEditROI = () => {
     setEditValue(roiDistributionData?.dailyRoiPercentage || '');
@@ -174,9 +201,9 @@ const Distribution = () => {
         <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 flex flex-col justify-between">
           <div>
             <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">Pool Distribution</p>
-            <p className="text-[24px] font-extrabold text-white tracking-tight">$14,290,551.42</p>
+            <p className="text-[24px] font-extrabold text-white tracking-tight">${poolFund.toLocaleString()}</p>
           </div>
-          <button onClick={() => { setAddModal({ open: true, type: 'pool' }); setAddValue('0.00'); }} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+          <button onClick={() => { setAddModal({ open: true, type: 'pool' }); setAddValue(poolFund.toString()); }} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
             <FiPlus className="w-3.5 h-3.5" />
             Add Pool Reward
           </button>
@@ -186,11 +213,11 @@ const Distribution = () => {
         <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 flex flex-col justify-between">
           <div>
             <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">Multi Reward Distribution</p>
-            <p className="text-[24px] font-extrabold text-white tracking-tight">$248,310.00</p>
+          
           </div>
-          <button onClick={() => { setAddModal({ open: true, type: 'multi' }); setAddValue('0.00'); }} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+          <button onClick={() => { setAddModal({ open: true, type: 'multi' }); setAddValue(''); }} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
             <FiPlus className="w-3.5 h-3.5" />
-            Add Multi Reward
+            Distribute Multi Reward
           </button>
         </div>
       </div>
@@ -248,10 +275,10 @@ const Distribution = () => {
             <span className="text-right">Status</span>
           </div>
 
-          {history.length === 0 ? (
+          {(activeTab === 'roi' ? history : multiHistory).length === 0 ? (
             <div className="px-6 py-12 text-center text-[13px] text-gray-500">No distribution history found.</div>
           ) : (
-            history.map((row, idx) => (
+            (activeTab === 'roi' ? history : multiHistory).map((row, idx) => (
               <div
                 key={row._id}
                 className="grid grid-cols-[0.8fr_2fr_1.5fr_1fr] gap-4 px-6 py-5 items-center border-b border-[#2d3a4f]/60 hover:bg-[#1a2435] transition-colors"
@@ -261,14 +288,17 @@ const Distribution = () => {
                 </span>
                 <div>
                   <p className="text-[13px] font-bold text-white leading-tight">
-                    {new Date(row.distributedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
+                    {new Date(activeTab === 'roi' ? row.distributedAt : row.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
                   </p>
                   <p className="text-[10px] text-gray-500 font-medium mt-0.5">
-                    {new Date(row.distributedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} UTC
+                    {new Date(activeTab === 'roi' ? row.distributedAt : row.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} UTC
                   </p>
                 </div>
                 <p className="text-[14px] font-bold text-white text-center">
-                  {row.totalRoiDistributed?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {activeTab === 'roi'
+                    ? row.totalRoiDistributed?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    : (row.breakdown?.reduce((sum, b) => sum + (b.totalDistributed || 0), 0))?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                  }
                 </p>
                 <div className="text-right">
                   <span className="inline-block px-3 py-1.5 rounded text-[10px] font-bold tracking-wide text-[#00e396] bg-[#00e396]/15">
@@ -342,17 +372,19 @@ const Distribution = () => {
               <h3 className="text-[20px] font-bold text-white">
                 {addModal.type === 'roi' && 'Add ROI'}
                 {addModal.type === 'pool' && 'Add Pool Reward'}
-                {addModal.type === 'multi' && 'Add Multi Reward'}
+                {addModal.type === 'multi' && 'Distribute Multi Reward'}
               </h3>
               <button onClick={() => setAddModal({ open: false, type: '' })} className="text-gray-400 hover:text-white cursor-pointer">
                 <FiX className="w-5 h-5" />
               </button>
             </div>
             <p className="text-[13px] text-gray-400 mb-5">
-              Enter the percentage distribution value for the current {addModal.type === 'roi' ? 'ROI' : addModal.type === 'pool' ? 'Pool Reward' : 'Multi Reward'} cycle.
+              {addModal.type === 'multi'
+                ? 'Enter the amount to distribute for the current Multi Reward cycle.'
+                : `Enter the percentage distribution value for the current ${addModal.type === 'roi' ? 'ROI' : 'Pool Reward'} cycle.`}
             </p>
             <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">
-              {addModal.type === 'roi' ? 'ROI' : addModal.type === 'pool' ? 'Pool Reward' : 'Multi Reward'} Percentage
+              {addModal.type === 'multi' ? 'Amount' : addModal.type === 'roi' ? 'ROI Percentage' : 'Pool Reward Percentage'}
             </p>
             <div className="flex items-center bg-[#0a0f1e] border border-[#1e293b] rounded-lg px-4 py-3 mb-6">
               <input
@@ -361,7 +393,7 @@ const Distribution = () => {
                 onChange={(e) => setAddValue(e.target.value)}
                 className="flex-1 bg-transparent text-white text-[16px] font-bold outline-none"
               />
-              <span className="text-gray-400 font-bold text-[16px]">%</span>
+              {addModal.type !== 'multi' && <span className="text-gray-400 font-bold text-[16px]">%</span>}
             </div>
             <div className="flex gap-3">
               <button
@@ -379,6 +411,8 @@ const Distribution = () => {
                       setRoiDistributionData(res.data.data);
                     } else if (addModal.type === 'pool') {
                       await distributePoolFund({ percentage: Number(addValue) });
+                    } else if (addModal.type === 'multi') {
+                      await distributeMultiReward({ amount: parseFloat(addValue) });
                     }
                     setAddModal({ open: false, type: '' });
                   } catch (err) {

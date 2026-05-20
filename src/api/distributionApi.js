@@ -17,6 +17,14 @@ export const distributePoolFund = async (data) => {
   return axiosInstance.post("/api/admin/pool-fund/distribute", data);
 }
 
+export const distributeMultiReward = async (data) => {
+  return axiosInstance.post("/api/admin/rank-bonus/distribute", data);
+}
+
+export const getRankBonusHistory = async (params = {}) => {
+  return axiosInstance.get("/api/admin/rank-bonus/history", { params });
+}
+
 export const getDistributionHistory = async (params = {}) => {
   return axiosInstance.get("/api/admin/roi/distributions", { params });
 }
