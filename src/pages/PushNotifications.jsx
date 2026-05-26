@@ -113,7 +113,7 @@ const PushNotifications = () => {
           {imageUrl && !preview ? (
             /* Show existing notification image */
             <div className="relative rounded-lg overflow-hidden border border-[#2d3a4f]">
-              <img src={imageUrl} alt="notification" crossOrigin="anonymous" className="w-full h-[280px] object-cover" />
+              <img src={imageUrl} alt="notification" crossOrigin="anonymous" className="w-full h-70 object-cover" />
               <button
                 onClick={handleDelete}
                 disabled={loading}
@@ -127,7 +127,7 @@ const PushNotifications = () => {
             /* Show selected image preview before upload */
             <>
               <div className="relative rounded-lg overflow-hidden border border-[#2d3a4f]">
-                <img src={preview} alt="preview" className="w-full h-[280px] object-cover" />
+                <img src={preview} alt="preview" className="w-full h-70 object-cover" />
               </div>
               <div className="flex items-center justify-end gap-4 mt-6">
                 <button
@@ -160,7 +160,7 @@ const PushNotifications = () => {
         </div>
 
         {/* Right - Settings Panel */}
-        <div className="w-[350px] flex flex-col gap-4">
+        <div className="w-87.5 flex flex-col gap-4">
           {/* Push Notifications Toggle */}
           <div className="bg-[#0f1522] border border-[#2d3a4f] rounded-[14px] px-4 py-3 flex items-center justify-between">
             <span className="text-[12px] font-semibold text-gray-300">Push Notifications</span>

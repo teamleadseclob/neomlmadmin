@@ -5,7 +5,7 @@ import { FiSearch, FiChevronLeft, FiChevronRight, FiEdit2 } from "react-icons/fi
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
-import {userlist, blockUser, unblockUser, changePassword, changeEmail, addUsdt } from "../api/membersApi"
+import {userlist, blockUser, unblockUser, changePassword, changeEmail, addUsdt, getUserById } from "../api/membersApi"
 
 const AllMembers = () => {
   const navigate = useNavigate()
@@ -32,6 +32,7 @@ const AllMembers = () => {
   const [fundMember, setFundMember] = useState(null)
   const [fundAmount, setFundAmount] = useState("")
   const [fundLoading, setFundLoading] = useState(false)
+  const [viewLoading, setViewLoading] = useState(false)
   const limit = 10
 
   const handleStatusChange = async (memberId, newStatus) => {
@@ -80,7 +81,7 @@ const AllMembers = () => {
       doc.text("All Members", 14, 20)
       autoTable(doc, {
         startY: 30,
-        head: [["#", "User ID", "Name", "Email", "Sponsor ID", "Total Invested", "Gross Earnings", "Withdrawn", "Status"]],
+        head: [["#", "User ID", "Name", "Email", "Sponsor ID", "Trading Capital", "Gross Earnings", "Withdrawn", "Status"]],
         body: allData.map((m, idx) => [
           idx + 1,
           m.userId || "-",
@@ -185,7 +186,7 @@ const AllMembers = () => {
                 <th className="px-5 py-4 text-left text-[11px] font-bold tracking-wider text-[#b0bec5] uppercase">Gross Earnings</th>
                 <th className="px-5 py-4 text-left text-[11px] font-bold tracking-wider text-[#b0bec5] uppercase">Identity</th>
                 <th className="px-5 py-4 text-left text-[11px] font-bold tracking-wider text-[#b0bec5] uppercase">Activation Package - SWP</th>
-                <th className="px-5 py-4 text-left text-[11px] font-bold tracking-wider text-[#b0bec5] uppercase">Total Invested</th>
+                <th className="px-5 py-4 text-left text-[11px] font-bold tracking-wider text-[#b0bec5] uppercase">Trading Capital</th>
                 <th className="px-5 py-4 text-left text-[11px] font-bold tracking-wider text-[#b0bec5] uppercase">Sponsor ID</th>
                 <th className="px-5 py-4 text-left text-[11px] font-bold tracking-wider text-[#b0bec5] uppercase">Status</th>
                 <th className="px-5 py-4 text-left text-[11px] font-bold tracking-wider text-[#b0bec5] uppercase">Withdrawn</th>
@@ -236,7 +237,19 @@ const AllMembers = () => {
                       <button onClick={() => { setFundMember(m); setShowAddFund(true); setFundAmount("") }} className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#25c3a3]/15 text-[#25c3a3] hover:bg-[#25c3a3]/25 transition-colors cursor-pointer whitespace-nowrap">ADD FUND</button>
                       <button onClick={() => navigate(`/packages/${m._id}`)} className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#3b82f6]/15 text-[#3b82f6] hover:bg-[#3b82f6]/25 transition-colors cursor-pointer whitespace-nowrap">ZERO PIN</button>
                       <button
-                        onClick={() => { setViewMember(m); setShowLoginPass(false); setShowTxnPass(false) }}
+                        onClick={async () => {
+                          setViewLoading(true)
+                          try {
+                            const res = await getUserById(m._id)
+                            setViewMember(res.data?.data || res.data)
+                          } catch {
+                            setViewMember(m)
+                          } finally {
+                            setViewLoading(false)
+                            setShowLoginPass(false)
+                            setShowTxnPass(false)
+                          }
+                        }}
                         className="w-8 h-8 rounded-full border border-[#2d3a4f] flex items-center justify-center text-[#94a3b8] hover:text-white hover:border-[#94a3b8] transition-colors cursor-pointer"
                       >
                         <IoEyeOutline className="text-[16px]" />
@@ -319,23 +332,14 @@ const AllMembers = () => {
               </div>
             </div>
 
-            {/* Row 2: Login Password, Transaction Password, Email */}
-            <div className="grid grid-cols-3 gap-3 mb-3">
+            {/* Row 2: Login Password, Email */}
+            <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
                 <label className="text-[10px] text-[#94a3b8] mb-1 block">Login Password</label>
                 <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white flex items-center justify-between">
                   <span>{showLoginPass ? "password123" : "••••••••"}</span>
                   <button onClick={() => setShowLoginPass(!showLoginPass)} className="text-[#94a3b8] hover:text-white cursor-pointer">
                     {showLoginPass ? <IoEyeOffOutline /> : <IoEyeOutline />}
-                  </button>
-                </div>
-              </div>
-              <div>
-                <label className="text-[10px] text-[#94a3b8] mb-1 block">Transaction Password</label>
-                <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white flex items-center justify-between">
-                  <span>{showTxnPass ? "txn12345" : "••••••••"}</span>
-                  <button onClick={() => setShowTxnPass(!showTxnPass)} className="text-[#94a3b8] hover:text-white cursor-pointer">
-                    {showTxnPass ? <IoEyeOffOutline /> : <IoEyeOutline />}
                   </button>
                 </div>
               </div>
