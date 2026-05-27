@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { getKycRequests, reviewKyc } from "../api/kyc"
-import { FiSearch, FiChevronDown, FiX, FiEye, FiImage } from "react-icons/fi"
+import { FiSearch, FiChevronDown, FiX, FiImage } from "react-icons/fi"
 
 const statusStyle = {
   pending: "text-yellow-400 bg-yellow-400/10 border border-yellow-400/30",
@@ -18,6 +18,7 @@ const KYC = () => {
   const [updating, setUpdating] = useState(false)
   const [rejectReason, setRejectReason] = useState("")
   const [pagination, setPagination] = useState({})
+  const [summary, setSummary] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 })
   const [imagePreview, setImagePreview] = useState(null)
   const [rejectModal, setRejectModal] = useState(null)
 
@@ -28,6 +29,7 @@ const KYC = () => {
       .then((res) => {
         setRequests(res.data.data.submissions)
         setPagination(res.data.data.pagination)
+        setSummary(res.data.data.summary)
       })
       .catch((err) => setError(err.response?.data?.message || "Failed to load KYC requests"))
       .finally(() => setLoading(false))
@@ -72,6 +74,21 @@ const KYC = () => {
       </div>
 
 
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { label: "Total", value: summary.total, color: "text-white", border: "border-[#1e293b]" },
+          { label: "Pending", value: summary.pending, color: "text-yellow-400", border: "border-yellow-400/30" },
+          { label: "Approved", value: summary.approved, color: "text-[#00e396]", border: "border-[#00e396]/30" },
+          { label: "Rejected", value: summary.rejected, color: "text-red-400", border: "border-red-400/30" },
+        ].map((card) => (
+          <div key={card.label} className={`bg-[#0f1522] border ${card.border} rounded-xl px-5 py-4`}>
+            <p className="text-[10px] font-bold tracking-[0.15em] text-gray-500 uppercase">{card.label}</p>
+            <p className={`text-[22px] font-bold mt-1 ${card.color}`}>{card.value}</p>
+          </div>
+        ))}
+      </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
