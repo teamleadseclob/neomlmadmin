@@ -186,7 +186,7 @@ const Distribution = () => {
       {/* 3 Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* ROI Distribution Card */}
-        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 flex flex-col justify-between">
+        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 flex flex-col">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">ROI Distribution</p>
@@ -196,39 +196,40 @@ const Distribution = () => {
               DISTRIBUTE
             </button>
           </div>
-          <button onClick={() => { setAddModal({ open: true, type: 'roi' }); setAddValue(roiDistributionData?.dailyRoiPercentage || '0.00'); }} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+          <button onClick={() => { setAddModal({ open: true, type: 'roi' }); setAddValue(roiDistributionData?.dailyRoiPercentage || '0.00'); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
             <FiPlus className="w-3.5 h-3.5" />
             Add ROI
           </button>
+          <p className="mt-2 text-[10px] text-yellow-400 italic">1st and 16th of every month.</p>
         </div>
 
         {/* Pool Distribution Card */}
-        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 flex flex-col justify-between">
+        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 flex flex-col">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">Pool Distribution</p>
               <p className="text-[24px] font-extrabold text-white tracking-tight">%{poolFund.toLocaleString()}</p>
             </div>
-            
           </div>
-          <button onClick={() => { setAddModal({ open: true, type: 'pool' }); setAddValue(poolFund.toString()); }} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+          <button onClick={() => { setAddModal({ open: true, type: 'pool' }); setAddValue(poolFund.toString()); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
             <FiPlus className="w-3.5 h-3.5" />
            DISTRIBUTE 
           </button>
+          <p className="mt-2 text-[10px] text-yellow-400 italic">1st of every month.</p>
         </div>
 
         {/* Multi Reward Distribution Card */}
-        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 flex flex-col justify-between">
+        <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-5 flex flex-col">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">Royality Reward Distribution</p>
             </div>
-       
           </div>
-          <button onClick={() => { setAddModal({ open: true, type: 'multi' }); setAddValue(''); }} className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+          <button onClick={() => { setAddModal({ open: true, type: 'multi' }); setAddValue(''); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
             <FiPlus className="w-3.5 h-3.5" />
             DISTRIBUTE
           </button>
+          <p className="mt-2 text-[10px] text-yellow-400 italic">1st of every month.</p>
         </div>
       </div>
 

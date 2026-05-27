@@ -15,6 +15,7 @@ import Tickets from "../pages/Tickets"
 import Subscribers from "../pages/Subscribers"
 import Settings from "../pages/Settings"
 import PushNotifications from "../pages/PushNotifications"
+import KYC from "../pages/KYC"
 import Login from "../pages/Login"
 
 const ProtectedRoute = ({ children }) => {
@@ -47,6 +48,7 @@ const router = createBrowserRouter([
       { path: "/tickets", element: <Tickets /> },
       { path: "/subscribers", element: <Subscribers /> },
       { path: "/push-notifications", element: <PushNotifications /> },
+      { path: "/kyc", element: <KYC /> },
       { path: "/settings", element: <Settings /> },
     ],
   },

@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Global Poppins font */
+* {
+  font-family: 'Poppins', sans-serif;
+}
+
 /* Global dark theme contrast improvements */
 body {
   background: #0a0f1e;
