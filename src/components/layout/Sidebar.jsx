@@ -14,7 +14,7 @@ import reports from "../../assets/icons/sidebar/reports.png"
 // import subscribersIcon from "../../assets/icons/sidebar/subscribers.png"
 import settingsIcon from "../../assets/icons/sidebar/settings.png"
 import logoutIcon from "../../assets/icons/sidebar/logout.png"
-import logoIcon from "../../assets/icons/sidebar/financeflow.png"
+import logoIcon from "../../assets/icons/sidebar/logo.svg"
 
 const menuItems = [
   { name: "Dashboard", path: "/", icon: dashboardIcon },
