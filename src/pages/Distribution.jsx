@@ -208,10 +208,10 @@ const Distribution = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">Pool Distribution</p>
-              <p className="text-[24px] font-extrabold text-white tracking-tight">%{poolFund.toLocaleString()}</p>
+              <p className="text-[24px] font-extrabold text-white tracking-tight">{poolFund.toLocaleString()}</p>
             </div>
           </div>
-          <button onClick={() => { setAddModal({ open: true, type: 'pool' }); setAddValue(poolFund.toString()); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+          <button onClick={() => { setAddModal({ open: true, type: 'pool' }); setAddValue(''); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
             <FiPlus className="w-3.5 h-3.5" />
            DISTRIBUTE 
           </button>
