@@ -29,6 +29,12 @@ const Distribution = () => {
   const [activeTab, setActiveTab] = useState('roi');
   const [addModal, setAddModal] = useState({ open: false, type: '' });
   const [addValue, setAddValue] = useState('0.00');
+  const [poolPercentage, setPoolPercentage] = useState(0);
+  const [showPoolConfirmModal, setShowPoolConfirmModal] = useState(false);
+  const [distributingPool, setDistributingPool] = useState(false);
+  const [multiAmount, setMultiAmount] = useState(0);
+  const [showMultiConfirmModal, setShowMultiConfirmModal] = useState(false);
+  const [distributingMulti, setDistributingMulti] = useState(false);
 
   React.useEffect(() => {
     const fetchDistributionData = async () => {
@@ -208,12 +214,15 @@ const Distribution = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">Pool Distribution</p>
-              <p className="text-[24px] font-extrabold text-white tracking-tight">{poolFund.toLocaleString()}</p>
+              <p className="text-[24px] font-extrabold text-white tracking-tight">{poolPercentage}%</p>
             </div>
+            <button onClick={() => setShowPoolConfirmModal(true)} className="px-4 py-2.5 rounded-lg text-[11px] font-bold cursor-pointer bg-[#25c3a3] text-[#0a0f1e] hover:bg-[#25c3a3]/80 transition-colors">
+              DISTRIBUTE
+            </button>
           </div>
-          <button onClick={() => { setAddModal({ open: true, type: 'pool' }); setAddValue(''); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+          <button onClick={() => { setAddModal({ open: true, type: 'pool' }); setAddValue(poolPercentage || ''); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
             <FiPlus className="w-3.5 h-3.5" />
-           DISTRIBUTE 
+            Add Pool Reward
           </button>
           <p className="mt-2 text-[10px] text-yellow-400 italic">1st of every month.</p>
         </div>
@@ -223,11 +232,15 @@ const Distribution = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">Royality Reward Distribution</p>
+              <p className="text-[24px] font-extrabold text-white tracking-tight">{multiAmount}</p>
             </div>
+            <button onClick={() => setShowMultiConfirmModal(true)} className="px-4 py-2.5 rounded-lg text-[11px] font-bold cursor-pointer bg-[#25c3a3] text-[#0a0f1e] hover:bg-[#25c3a3]/80 transition-colors">
+              DISTRIBUTE
+            </button>
           </div>
-          <button onClick={() => { setAddModal({ open: true, type: 'multi' }); setAddValue(''); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+          <button onClick={() => { setAddModal({ open: true, type: 'multi' }); setAddValue(multiAmount || ''); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
             <FiPlus className="w-3.5 h-3.5" />
-            DISTRIBUTE
+            Add Royality Reward
           </button>
           <p className="mt-2 text-[10px] text-yellow-400 italic">1st of every month.</p>
         </div>
@@ -405,6 +418,86 @@ const Distribution = () => {
         </div>
       )}
 
+      {/* Multi Reward Distribute Confirm Modal */}
+      {showMultiConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-6 w-full max-w-sm mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-[20px] font-bold text-white">Confirm Royality Reward Distribution</h3>
+              <button onClick={() => setShowMultiConfirmModal(false)} className="text-gray-400 hover:text-white cursor-pointer">
+                <FiX className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-[13px] text-gray-400 mb-6">Are you sure you want to distribute Royality Reward of {multiAmount} to all eligible users?</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowMultiConfirmModal(false)}
+                className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer border border-[#1e293b] text-gray-300 hover:border-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    setDistributingMulti(true);
+                    await distributeMultiReward({ amount: multiAmount });
+                    setShowMultiConfirmModal(false);
+                  } catch (err) {
+                    setError(err.response?.data?.message || 'Failed to distribute Royality Reward');
+                  } finally {
+                    setDistributingMulti(false);
+                  }
+                }}
+                disabled={distributingMulti}
+                className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer bg-[#25c3a3] text-[#0a0f1e] hover:bg-[#25c3a3]/80 transition-colors disabled:opacity-50"
+              >
+                {distributingMulti ? 'Distributing...' : 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pool Distribute Confirm Modal */}
+      {showPoolConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-6 w-full max-w-sm mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-[20px] font-bold text-white">Confirm Pool Distribution</h3>
+              <button onClick={() => setShowPoolConfirmModal(false)} className="text-gray-400 hover:text-white cursor-pointer">
+                <FiX className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-[13px] text-gray-400 mb-6">Are you sure you want to distribute Pool Reward at {poolPercentage}% to all eligible users?</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowPoolConfirmModal(false)}
+                className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer border border-[#1e293b] text-gray-300 hover:border-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    setDistributingPool(true);
+                    await distributePoolFund({ percentage: poolPercentage });
+                    setShowPoolConfirmModal(false);
+                  } catch (err) {
+                    setError(err.response?.data?.message || 'Failed to distribute Pool Reward');
+                  } finally {
+                    setDistributingPool(false);
+                  }
+                }}
+                disabled={distributingPool}
+                className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer bg-[#25c3a3] text-[#0a0f1e] hover:bg-[#25c3a3]/80 transition-colors disabled:opacity-50"
+              >
+                {distributingPool ? 'Distributing...' : 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add Modal */}
       {addModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -413,7 +506,7 @@ const Distribution = () => {
               <h3 className="text-[20px] font-bold text-white">
                 {addModal.type === 'roi' && 'Add ROI'}
                 {addModal.type === 'pool' && 'Add Pool Reward'}
-                {addModal.type === 'multi' && 'Distribute Royality Reward'}
+                {addModal.type === 'multi' && 'Add Royality Reward'}
               </h3>
               <button onClick={() => setAddModal({ open: false, type: '' })} className="text-gray-400 hover:text-white cursor-pointer">
                 <FiX className="w-5 h-5" />
@@ -421,7 +514,7 @@ const Distribution = () => {
             </div>
             <p className="text-[13px] text-gray-400 mb-5">
               {addModal.type === 'multi'
-                ? 'Enter the amount to distribute for the current Multi Reward cycle.'
+                ? 'Enter the amount for the current Royality Reward cycle.'
                 : `Enter the percentage distribution value for the current ${addModal.type === 'roi' ? 'ROI' : 'Pool Reward'} cycle.`}
             </p>
             <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">
@@ -451,9 +544,9 @@ const Distribution = () => {
                       const res = await getDistributionData();
                       setRoiDistributionData(res.data.data);
                     } else if (addModal.type === 'pool') {
-                      await distributePoolFund({ percentage: Number(addValue) });
+                      setPoolPercentage(Number(addValue));
                     } else if (addModal.type === 'multi') {
-                      await distributeMultiReward({ amount: parseFloat(addValue) });
+                      setMultiAmount(parseFloat(addValue));
                     }
                     setAddModal({ open: false, type: '' });
                   } catch (err) {
