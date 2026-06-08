@@ -179,7 +179,7 @@ const AllMembers = () => {
 
         {/* Scrollable Table */}
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1100px]">
+          <table className="w-full min-w-275">
             <thead>
               <tr className="border-b border-[#2d3a4f] bg-[#080d1a]/60">
                 <th className="px-5 py-4 text-left text-[11px] font-bold tracking-wider text-[#b0bec5] uppercase">User ID</th>
@@ -203,8 +203,8 @@ const AllMembers = () => {
                     <span className="text-[13px] font-semibold text-white">${m.totalGrossEarnings?.toLocaleString()}</span>
                   </td>
                   <td className="px-5 py-4">
-                    <p className="text-[13px] font-semibold text-white truncate max-w-[160px]">{m.name}</p>
-                    <p className="text-[11px] text-[#94a3b8] truncate max-w-[160px]">{m.email}</p>
+                    <p className="text-[13px] font-semibold text-white truncate max-w-40">{m.name}</p>
+                    <p className="text-[11px] text-[#94a3b8] truncate max-w-40">{m.email}</p>
                   </td>
                   <td className="px-5 py-4">
                     <span className="text-[13px] font-semibold text-white">${m.swpBalance?.toLocaleString() || "0"}</span>
@@ -301,7 +301,7 @@ const AllMembers = () => {
       {/* Member Details Modal */}
       {viewMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="w-full max-w-[720px] max-h-[90vh] overflow-y-auto rounded-2xl bg-[#111827] border border-[#2d3a4f] p-6 relative">
+          <div className="w-full max-w-180 max-h-[90vh] overflow-y-auto rounded-2xl bg-[#111827] border border-[#2d3a4f] p-6 relative">
             {/* Header */}
             <div className="flex items-start justify-between mb-5">
               <div>
@@ -319,15 +319,15 @@ const AllMembers = () => {
             {/* Row 1: S.No, User ID, Username */}
             <div className="grid grid-cols-3 gap-3 mb-3">
               <div>
-                <label className="text-[10px] text-[#94a3b8] mb-1 block">S. No</label>
+                <label htmlFor="sno" className="text-[10px] text-[#94a3b8] mb-1 block">S. No</label>
                 <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white">1</div>
               </div>
               <div>
-                <label className="text-[10px] text-[#94a3b8] mb-1 block">User ID</label>
+                <label htmlFor="userId" className="text-[10px] text-[#94a3b8] mb-1 block">User ID</label>
                 <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white">{viewMember.userId}</div>
               </div>
               <div>
-                <label className="text-[10px] text-[#94a3b8] mb-1 block">Username</label>
+                <label htmlFor="username" className="text-[10px] text-[#94a3b8] mb-1 block">Username</label>
                 <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white">{viewMember.name?.toLowerCase().replace(/\s/g, "_")}</div>
               </div>
             </div>
@@ -335,7 +335,7 @@ const AllMembers = () => {
             {/* Row 2: Login Password, Email */}
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <label className="text-[10px] text-[#94a3b8] mb-1 block">Login Password</label>
+                <label htmlFor="loginPassword" className="text-[10px] text-[#94a3b8] mb-1 block">Login Password</label>
                 <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white flex items-center justify-between">
                   <span>{showLoginPass ? "password123" : "••••••••"}</span>
                   <button onClick={() => setShowLoginPass(!showLoginPass)} className="text-[#94a3b8] hover:text-white cursor-pointer">
@@ -344,7 +344,7 @@ const AllMembers = () => {
                 </div>
               </div>
               <div>
-                <label className="text-[10px] text-[#94a3b8] mb-1 block">Email (Editable)</label>
+                <label htmlFor="email" className="text-[10px] text-[#94a3b8] mb-1 block">Email (Editable)</label>
                 <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white flex items-center justify-between">
                   <span className="truncate">{viewMember.email}</span>
                   <FiEdit2 onClick={() => setShowEditEmail(true)} className="text-[#25c3a3] shrink-0 cursor-pointer ml-2" />
@@ -355,15 +355,15 @@ const AllMembers = () => {
             {/* Row 3: Full Name, Mobile, User Type */}
             <div className="grid grid-cols-3 gap-3 mb-3">
               <div>
-                <label className="text-[10px] text-[#94a3b8] mb-1 block">Full Name</label>
+                <label htmlFor="fullName" className="text-[10px] text-[#94a3b8] mb-1 block">Full Name</label>
                 <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white">{viewMember.name}</div>
               </div>
               <div>
-                <label className="text-[10px] text-[#94a3b8] mb-1 block">Mobile</label>
+                <label htmlFor="mobile" className="text-[10px] text-[#94a3b8] mb-1 block">Mobile</label>
                 <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white">{viewMember.phoneNumber || "—"}</div>
               </div>
               <div>
-                <label className="text-[10px] text-[#94a3b8] mb-1 block">User Type</label>
+                <label htmlFor="userType" className="text-[10px] text-[#94a3b8] mb-1 block">User Type</label>
                 <div className={`px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] font-semibold ${viewMember.isBlocked ? "text-[#ef4444]" : "text-[#25c3a3]"}`}>● {viewMember.isBlocked ? "BLOCKED" : "ACTIVE"}</div>
               </div>
             </div>
@@ -371,15 +371,15 @@ const AllMembers = () => {
             {/* Row 4: Sponsor ID, Sponsor Name, Trading Capital */}
             <div className="grid grid-cols-3 gap-3 mb-3">
               <div>
-                <label className="text-[10px] text-[#94a3b8] mb-1 block">Sponsor ID</label>
+                <label htmlFor="sponsorId" className="text-[10px] text-[#94a3b8] mb-1 block">Sponsor ID</label>
                 <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white">{viewMember.sponsorId || "—"}</div>
               </div>
               <div>
-                <label className="text-[10px] text-[#94a3b8] mb-1 block">Sponsor Name</label>
+                <label htmlFor="sponsorName" className="text-[10px] text-[#94a3b8] mb-1 block">Sponsor Name</label>
                 <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white">System Master</div>
               </div>
               <div>
-                <label className="text-[10px] text-[#94a3b8] mb-1 block">Trading Capital</label>
+                <label htmlFor="tradingCapital" className="text-[10px] text-[#94a3b8] mb-1 block">Trading Capital</label>
                 <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white">${viewMember.maxInvestmentLimit?.toLocaleString() || "0"}.00</div>
               </div>
             </div>
@@ -390,21 +390,21 @@ const AllMembers = () => {
               <div className="flex flex-col justify-between gap-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[10px] text-[#94a3b8] mb-1 block">Reg. Date</label>
+                    <label htmlFor="regDate" className="text-[10px] text-[#94a3b8] mb-1 block">Reg. Date</label>
                     <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[12px] text-white">{viewMember.createdAt?.split("T")[0] || "—"}</div>
                   </div>
                   <div>
-                    <label className="text-[10px] text-[#94a3b8] mb-1 block">Activation Date</label>
+                    <label htmlFor="activationDate" className="text-[10px] text-[#94a3b8] mb-1 block">Activation Date</label>
                     <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[12px] text-white">{viewMember.updatedAt?.split("T")[0] || "—"}</div>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[10px] text-[#94a3b8] mb-1 block">Country</label>
+                    <label htmlFor="country" className="text-[10px] text-[#94a3b8] mb-1 block">Country</label>
                     <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[12px] text-white">{viewMember.country || "—"}</div>
                   </div>
                   <div>
-                    <label className="text-[10px] text-[#94a3b8] mb-1 block">Total Team</label>
+                    <label htmlFor="totalTeam" className="text-[10px] text-[#94a3b8] mb-1 block">Total Team</label>
                     <div className="px-3 py-2.5 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[12px] text-white">— Members</div>
                   </div>
                 </div>
@@ -424,12 +424,12 @@ const AllMembers = () => {
                         handleStatusChange(viewMember._id, newStatus)
                         setViewMember({ ...viewMember, isBlocked: !viewMember.isBlocked })
                       }}
-                      className={`w-10 h-[22px] rounded-full relative transition-colors cursor-pointer ${
+                      className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
                         !viewMember.isBlocked ? "bg-[#25c3a3]" : "bg-[#374151]"
                       }`}
                     >
-                      <span className={`absolute top-[3px] w-4 h-4 rounded-full bg-white transition-all ${
-                        !viewMember.isBlocked ? "right-[3px]" : "left-[3px]"
+                      <span className={`absolute top-0.75 w-4 h-4 rounded-full bg-white transition-all ${
+                        !viewMember.isBlocked ? "right-0.75" : "left-0.75"
                       }`} />
                     </button>
                     <span className={`text-[11px] font-bold ${!viewMember.isBlocked ? "text-[#25c3a3]" : "text-[#ef4444]"}`}>
@@ -453,8 +453,8 @@ const AllMembers = () => {
 
       {/* Edit Password Modal */}
       {showEditPassword && viewMember && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="w-full max-w-[480px] rounded-2xl bg-[#111827] border border-[#2d3a4f] p-6 relative">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="w-full max-w-120 rounded-2xl bg-[#111827] border border-[#2d3a4f] p-6 relative">
             <div className="flex items-start justify-between mb-1">
               <h2 className="text-[18px] font-bold text-white">Change Password</h2>
               <button onClick={() => { setShowEditPassword(false); setNewLoginPass(""); setConfirmLoginPass("") }} className="text-[#94a3b8] hover:text-white transition-colors cursor-pointer">
@@ -479,7 +479,7 @@ const AllMembers = () => {
 
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div>
-                <label className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wide mb-2 block">New Login Password</label>
+                <label htmlFor="New password" className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wide mb-2 block">New Login Password</label>
                 <div className="relative">
                   <input
                     type={showNewLoginPass ? "text" : "password"}
@@ -494,7 +494,7 @@ const AllMembers = () => {
                 </div>
               </div>
               <div>
-                <label className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wide mb-2 block">Confirm New Password</label>
+                <label htmlFor="Confirm new password" className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wide mb-2 block">Confirm New Password</label>
                 <input
                   type="password"
                   placeholder="Repeat password"
@@ -535,7 +535,7 @@ const AllMembers = () => {
                     setPasswordLoading(false)
                   }
                 }}
-                className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#25c3a3] to-[#1da88a] text-[13px] font-bold text-white hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-linear-to-r from-[#25c3a3] to-[#1da88a] text-[13px] font-bold text-white hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
               >{passwordLoading ? "Updating..." : "Update Password"}</button>
             </div>
           </div>
@@ -544,8 +544,8 @@ const AllMembers = () => {
 
       {/* Add Fund Modal */}
       {showAddFund && fundMember && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="w-full max-w-[400px] rounded-2xl bg-[#111827] border border-[#2d3a4f] p-6 relative">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="w-full max-w-100 rounded-2xl bg-[#111827] border border-[#2d3a4f] p-6 relative">
             <div className="flex items-start justify-between mb-1">
               <h2 className="text-[18px] font-bold text-white">Add Fund</h2>
               <button onClick={() => setShowAddFund(false)} className="text-[#94a3b8] hover:text-white transition-colors cursor-pointer">
@@ -555,7 +555,7 @@ const AllMembers = () => {
             <p className="text-[12px] text-[#94a3b8] mb-6">Adding fund to Member: <span className="text-[#25c3a3] font-semibold">{fundMember.userId}</span></p>
 
             <div className="mb-6">
-              <label className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wide mb-2 block">Amount ($)</label>
+              <label htmlFor="Amount"   className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wide mb-2 block">Amount ($)</label>
               <input
                 type="number"
                 placeholder="Enter amount"
@@ -583,7 +583,7 @@ const AllMembers = () => {
                     setFundLoading(false)
                   }
                 }}
-                className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#25c3a3] to-[#1da88a] text-[13px] font-bold text-white hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-linear-to-r from-[#25c3a3] to-[#1da88a] text-[13px] font-bold text-white hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
               >{fundLoading ? "Processing..." : "Add Fund"}</button>
             </div>
           </div>
@@ -592,8 +592,8 @@ const AllMembers = () => {
 
       {/* Edit Email Modal */}
       {showEditEmail && viewMember && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="w-full max-w-[480px] rounded-2xl bg-[#111827] border border-[#2d3a4f] p-6 relative">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="w-full max-w-120 rounded-2xl bg-[#111827] border border-[#2d3a4f] p-6 relative">
             {/* Header */}
             <div className="flex items-start justify-between mb-1">
               <h2 className="text-[18px] font-bold text-white">Edit Email Address</h2>
@@ -612,7 +612,7 @@ const AllMembers = () => {
             </p>
 
             <div className="mb-4">
-              <label className="text-[12px] font-semibold text-white mb-2 block">Current Email</label>
+              <label htmlFor="current-email" className="text-[12px] font-semibold text-white mb-2 block">Current Email</label>
               <div className="px-4 py-3 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-[#94a3b8] flex items-center justify-between">
                 <span>{viewMember.email}</span>
                 <svg className="w-4 h-4 text-[#64748b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -620,7 +620,7 @@ const AllMembers = () => {
             </div>
 
             <div className="mb-4">
-              <label className="text-[12px] font-semibold text-white mb-2 block">New Email Address</label>
+              <label htmlFor="new-email" className="text-[12px] font-semibold text-white mb-2 block">New Email Address</label>
               <input
                 type="email"
                 placeholder="Enter new email address"
@@ -631,7 +631,7 @@ const AllMembers = () => {
             </div>
 
             <div className="mb-6">
-              <label className="text-[12px] font-semibold text-white mb-2 block">Confirm New Email Address</label>
+              <label htmlFor="confirm-email" className="text-[12px] font-semibold text-white mb-2 block">Confirm New Email Address</label>
               <input
                 type="email"
                 placeholder="Repeat new email address"
@@ -662,7 +662,7 @@ const AllMembers = () => {
                     setEmailLoading(false)
                   }
                 }}
-                className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#25c3a3] to-[#1da88a] text-[13px] font-bold text-white hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-linear-to-r from-[#25c3a3] to-[#1da88a] text-[13px] font-bold text-white hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
               >{emailLoading ? "Updating..." : "Update Email Address"}</button>
             </div>
           </div>

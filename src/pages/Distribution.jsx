@@ -5,9 +5,10 @@ import {
   FiFilter, FiEdit3, FiX, FiPlus
 } from 'react-icons/fi';
 import { BsFiletypePdf } from 'react-icons/bs';
+import toast from 'react-hot-toast';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { getDistributionData , updateRoiDistributionData, distributeRoi , getDistributionHistory, distributePoolFund, distributeMultiReward, getRankBonusHistory} from '../api/distributionApi';
+import { getDistributionData , updateRoiDistributionData, distributeRoi , getDistributionHistory, distributePoolFund, distributeMultiReward, getRankBonusHistory, getPoolConfig, updatePoolConfig, getRankBonusAmountConfig, updateRankBonusAmountConfig} from '../api/distributionApi';
 import { getDashboardDataApi } from '../api/dashboardApi';
 
 
@@ -56,8 +57,28 @@ const Distribution = () => {
       }
     };
 
+    const fetchPoolConfig = async () => {
+      try {
+        const res = await getPoolConfig();
+        setPoolPercentage(res.data?.data?.percentage || 0);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const fetchRankBonusAmountConfig = async () => {
+      try {
+        const res = await getRankBonusAmountConfig();
+        setMultiAmount(res.data?.data?.amount || 0);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
     fetchDistributionData();
     fetchDashboardData();
+    fetchPoolConfig();
+    fetchRankBonusAmountConfig();
   }, []);
 
   React.useEffect(() => {
@@ -112,6 +133,7 @@ const Distribution = () => {
       await distributeRoi();
       setShowConfirmModal(false);
       setModalError('');
+      toast.success('ROI distributed successfully!');
     } catch (error) {
       setModalError(error.response?.data?.message || 'Failed to distribute ROI');
     } finally {
@@ -222,7 +244,7 @@ const Distribution = () => {
               DISTRIBUTE
             </button>
           </div>
-          <button onClick={() => { setAddModal({ open: true, type: 'pool' }); setAddValue(poolPercentage || ''); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+          <button onClick={() => { setAddModal({ open: true, type: 'pool' }); setAddValue(''); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
             <FiPlus className="w-3.5 h-3.5" />
             Add Pool Reward
           </button>
@@ -240,7 +262,7 @@ const Distribution = () => {
               DISTRIBUTE
             </button>
           </div>
-          <button onClick={() => { setAddModal({ open: true, type: 'multi' }); setAddValue(multiAmount || ''); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
+          <button onClick={() => { setAddModal({ open: true, type: 'multi' }); setAddValue(''); }} className="mt-auto pt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-bold cursor-pointer border border-[#25c3a3] text-[#25c3a3] hover:bg-[#25c3a3]/10 transition-colors">
             <FiPlus className="w-3.5 h-3.5" />
             Add Royality Reward
           </button>
@@ -444,9 +466,10 @@ const Distribution = () => {
                 onClick={async () => {
                   try {
                     setDistributingMulti(true);
-                    await distributeMultiReward({ amount: multiAmount });
+                    await distributeMultiReward();
                     setShowMultiConfirmModal(false);
                     setModalError('');
+                    toast.success('Royality Reward distributed successfully!');
                   } catch (err) {
                     setModalError(err.response?.data?.message || 'Failed to distribute Royality Reward');
                   } finally {
@@ -486,9 +509,10 @@ const Distribution = () => {
                 onClick={async () => {
                   try {
                     setDistributingPool(true);
-                    await distributePoolFund({ percentage: poolPercentage });
+                    await distributePoolFund();
                     setShowPoolConfirmModal(false);
                     setModalError('');
+                    toast.success('Pool Reward distributed successfully!');
                   } catch (err) {
                     setModalError(err.response?.data?.message || 'Failed to distribute Pool Reward');
                   } finally {
@@ -552,9 +576,13 @@ const Distribution = () => {
                       const res = await getDistributionData();
                       setRoiDistributionData(res.data.data);
                     } else if (addModal.type === 'pool') {
-                      setPoolPercentage(Number(addValue));
+                      await updatePoolConfig(Number(addValue));
+                      const res = await getPoolConfig();
+                      setPoolPercentage(res.data?.data?.percentage || 0);
                     } else if (addModal.type === 'multi') {
-                      setMultiAmount(parseFloat(addValue));
+                      await updateRankBonusAmountConfig(parseFloat(addValue));
+                      const res = await getRankBonusAmountConfig();
+                      setMultiAmount(res.data?.data?.amount || 0);
                     }
                     setAddModal({ open: false, type: '' });
                   } catch (err) {

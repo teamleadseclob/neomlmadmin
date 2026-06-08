@@ -313,7 +313,7 @@ const KYC = () => {
             {/* Reject Reason Input */}
             {selectedRequest.status === "pending" && (
               <div className="space-y-2">
-                <label className="text-[10px] font-bold tracking-[0.15em] text-gray-500 uppercase">Rejection Reason (optional)</label>
+                <label htmlFor="Rejection Reason" className="text-[10px] font-bold tracking-[0.15em] text-gray-500 uppercase">Rejection Reason (optional)</label>
                 <textarea
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
