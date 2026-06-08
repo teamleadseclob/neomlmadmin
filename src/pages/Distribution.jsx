@@ -35,6 +35,7 @@ const Distribution = () => {
   const [multiAmount, setMultiAmount] = useState(0);
   const [showMultiConfirmModal, setShowMultiConfirmModal] = useState(false);
   const [distributingMulti, setDistributingMulti] = useState(false);
+  const [modalError, setModalError] = useState('');
 
   React.useEffect(() => {
     const fetchDistributionData = async () => {
@@ -110,8 +111,9 @@ const Distribution = () => {
       setDistributing(true);
       await distributeRoi();
       setShowConfirmModal(false);
+      setModalError('');
     } catch (error) {
-      setError(error.response?.data?.message || 'Failed to distribute ROI');
+      setModalError(error.response?.data?.message || 'Failed to distribute ROI');
     } finally {
       setDistributing(false);
     }
@@ -394,14 +396,15 @@ const Distribution = () => {
           <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-6 w-full max-w-sm mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[20px] font-bold text-white">Confirm ROI Distribution</h3>
-              <button onClick={() => setShowConfirmModal(false)} className="text-gray-400 hover:text-white cursor-pointer">
+              <button onClick={() => { setShowConfirmModal(false); setModalError(''); }} className="text-gray-400 hover:text-white cursor-pointer">
                 <FiX className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-[13px] text-gray-400 mb-6">Are you sure you want to distribute ROI at {roiDistributionData?.dailyRoiPercentage ?? 0}% to all eligible users?</p>
+            <p className="text-[13px] text-gray-400 mb-4">Are you sure you want to distribute ROI at {roiDistributionData?.dailyRoiPercentage ?? 0}% to all eligible users?</p>
+            {modalError && <p className="text-[12px] text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 mb-4">{modalError}</p>}
             <div className="flex gap-3">
               <button
-                onClick={() => setShowConfirmModal(false)}
+                onClick={() => { setShowConfirmModal(false); setModalError(''); }}
                 className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer border border-[#1e293b] text-gray-300 hover:border-gray-400 transition-colors"
               >
                 Cancel
@@ -424,14 +427,15 @@ const Distribution = () => {
           <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-6 w-full max-w-sm mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[20px] font-bold text-white">Confirm Royality Reward Distribution</h3>
-              <button onClick={() => setShowMultiConfirmModal(false)} className="text-gray-400 hover:text-white cursor-pointer">
+              <button onClick={() => { setShowMultiConfirmModal(false); setModalError(''); }} className="text-gray-400 hover:text-white cursor-pointer">
                 <FiX className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-[13px] text-gray-400 mb-6">Are you sure you want to distribute Royality Reward of {multiAmount} to all eligible users?</p>
+            <p className="text-[13px] text-gray-400 mb-4">Are you sure you want to distribute Royality Reward of {multiAmount} to all eligible users?</p>
+            {modalError && <p className="text-[12px] text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 mb-4">{modalError}</p>}
             <div className="flex gap-3">
               <button
-                onClick={() => setShowMultiConfirmModal(false)}
+                onClick={() => { setShowMultiConfirmModal(false); setModalError(''); }}
                 className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer border border-[#1e293b] text-gray-300 hover:border-gray-400 transition-colors"
               >
                 Cancel
@@ -442,8 +446,9 @@ const Distribution = () => {
                     setDistributingMulti(true);
                     await distributeMultiReward({ amount: multiAmount });
                     setShowMultiConfirmModal(false);
+                    setModalError('');
                   } catch (err) {
-                    setError(err.response?.data?.message || 'Failed to distribute Royality Reward');
+                    setModalError(err.response?.data?.message || 'Failed to distribute Royality Reward');
                   } finally {
                     setDistributingMulti(false);
                   }
@@ -464,14 +469,15 @@ const Distribution = () => {
           <div className="bg-[#0f1522] border border-[#1e293b] rounded-[14px] p-6 w-full max-w-sm mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[20px] font-bold text-white">Confirm Pool Distribution</h3>
-              <button onClick={() => setShowPoolConfirmModal(false)} className="text-gray-400 hover:text-white cursor-pointer">
+              <button onClick={() => { setShowPoolConfirmModal(false); setModalError(''); }} className="text-gray-400 hover:text-white cursor-pointer">
                 <FiX className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-[13px] text-gray-400 mb-6">Are you sure you want to distribute Pool Reward at {poolPercentage}% to all eligible users?</p>
+            <p className="text-[13px] text-gray-400 mb-4">Are you sure you want to distribute Pool Reward at {poolPercentage}% to all eligible users?</p>
+            {modalError && <p className="text-[12px] text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 mb-4">{modalError}</p>}
             <div className="flex gap-3">
               <button
-                onClick={() => setShowPoolConfirmModal(false)}
+                onClick={() => { setShowPoolConfirmModal(false); setModalError(''); }}
                 className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer border border-[#1e293b] text-gray-300 hover:border-gray-400 transition-colors"
               >
                 Cancel
@@ -482,8 +488,9 @@ const Distribution = () => {
                     setDistributingPool(true);
                     await distributePoolFund({ percentage: poolPercentage });
                     setShowPoolConfirmModal(false);
+                    setModalError('');
                   } catch (err) {
-                    setError(err.response?.data?.message || 'Failed to distribute Pool Reward');
+                    setModalError(err.response?.data?.message || 'Failed to distribute Pool Reward');
                   } finally {
                     setDistributingPool(false);
                   }
@@ -508,10 +515,11 @@ const Distribution = () => {
                 {addModal.type === 'pool' && 'Add Pool Reward'}
                 {addModal.type === 'multi' && 'Add Royality Reward'}
               </h3>
-              <button onClick={() => setAddModal({ open: false, type: '' })} className="text-gray-400 hover:text-white cursor-pointer">
+              <button onClick={() => { setAddModal({ open: false, type: '' }); setModalError(''); }} className="text-gray-400 hover:text-white cursor-pointer">
                 <FiX className="w-5 h-5" />
               </button>
             </div>
+            {modalError && <p className="text-[12px] text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 mb-4">{modalError}</p>}
             <p className="text-[13px] text-gray-400 mb-5">
               {addModal.type === 'multi'
                 ? 'Enter the amount for the current Royality Reward cycle.'
@@ -531,7 +539,7 @@ const Distribution = () => {
             </div>
             <div className="flex gap-3">
               <button
-                onClick={() => setAddModal({ open: false, type: '' })}
+                onClick={() => { setAddModal({ open: false, type: '' }); setModalError(''); }}
                 className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer border border-[#1e293b] text-gray-300 hover:border-gray-400 transition-colors"
               >
                 Close
@@ -550,8 +558,7 @@ const Distribution = () => {
                     }
                     setAddModal({ open: false, type: '' });
                   } catch (err) {
-                    setError(err.response?.data?.message || 'Failed to submit');
-                    setAddModal({ open: false, type: '' });
+                    setModalError(err.response?.data?.message || 'Failed to submit');
                   }
                 }}
                 className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer bg-[#25c3a3] text-[#0a0f1e] hover:bg-[#25c3a3]/80 transition-colors"
