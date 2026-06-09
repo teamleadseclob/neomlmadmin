@@ -44,3 +44,7 @@ export const getRankBonusHistory = async (params = {}) => {
 export const getDistributionHistory = async (params = {}) => {
   return axiosInstance.get("/api/admin/roi/distributions", { params });
 }
+
+export const poolfundpreview = async (percentage) => {
+  return axiosInstance.get("/api/admin/pool-fund/preview", { params: { percentage } });
+}

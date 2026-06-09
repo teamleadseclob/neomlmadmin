@@ -8,7 +8,7 @@ import { BsFiletypePdf } from 'react-icons/bs';
 import toast from 'react-hot-toast';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { getDistributionData , updateRoiDistributionData, distributeRoi , getDistributionHistory, distributePoolFund, distributeMultiReward, getRankBonusHistory, getPoolConfig, updatePoolConfig, getRankBonusAmountConfig, updateRankBonusAmountConfig} from '../api/distributionApi';
+import { getDistributionData , updateRoiDistributionData, distributeRoi , getDistributionHistory, distributePoolFund, distributeMultiReward, getRankBonusHistory, getPoolConfig, updatePoolConfig, getRankBonusAmountConfig, updateRankBonusAmountConfig, poolfundpreview} from '../api/distributionApi';
 import { getDashboardDataApi } from '../api/dashboardApi';
 
 
@@ -40,6 +40,8 @@ const Distribution = () => {
   const [showMultiConfirmModal, setShowMultiConfirmModal] = useState(false);
   const [distributingMulti, setDistributingMulti] = useState(false);
   const [modalError, setModalError] = useState('');
+  const [poolPreview, setPoolPreview] = useState(null);
+  const [poolPreviewLoading, setPoolPreviewLoading] = useState(false);
 
   React.useEffect(() => {
     const fetchDistributionData = async () => {
@@ -563,7 +565,7 @@ const Distribution = () => {
                 {addModal.type === 'pool' && 'Add Pool Reward'}
                 {addModal.type === 'multi' && 'Add Royality Reward'}
               </h3>
-              <button onClick={() => { setAddModal({ open: false, type: '' }); setModalError(''); }} className="text-gray-400 hover:text-white cursor-pointer">
+              <button onClick={() => { setAddModal({ open: false, type: '' }); setModalError(''); setPoolPreview(null); }} className="text-gray-400 hover:text-white cursor-pointer">
                 <FiX className="w-5 h-5" />
               </button>
             </div>
@@ -576,18 +578,52 @@ const Distribution = () => {
             <p className="text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2">
               {addModal.type === 'multi' ? 'Amount' : addModal.type === 'roi' ? 'ROI Percentage' : 'Pool Reward Percentage'}
             </p>
-            <div className="flex items-center bg-[#0a0f1e] border border-[#1e293b] rounded-lg px-4 py-3 mb-6">
+            <div className="flex items-center bg-[#0a0f1e] border border-[#1e293b] rounded-lg px-4 py-3 mb-3">
               <input
                 type="number"
                 value={addValue}
-                onChange={(e) => setAddValue(e.target.value)}
+                onChange={async (e) => {
+                  const val = addModal.type === 'pool' ? Math.min(100, Number(e.target.value)) : e.target.value;
+                  setAddValue(val);
+                  if (addModal.type === 'pool' && val) {
+                    setPoolPreviewLoading(true);
+                    setPoolPreview(null);
+                    try {
+                      const res = await poolfundpreview(Number(val));
+                      setPoolPreview(res.data?.data);
+                    } catch (err) {
+                      setPoolPreview(null);
+                    } finally {
+                      setPoolPreviewLoading(false);
+                    }
+                  } else {
+                    setPoolPreview(null);
+                  }
+                }}
+                min="0"
+                max={addModal.type === 'pool' ? 100 : undefined}
                 className="flex-1 bg-transparent text-white text-[16px] font-bold outline-none"
               />
               {addModal.type !== 'multi' && <span className="text-gray-400 font-bold text-[16px]">%</span>}
             </div>
+            {addModal.type === 'pool' && poolPreview && (
+              <div className="bg-[#0a0f1e] border border-[#1e293b] rounded-lg px-4 py-3 mb-4 space-y-1.5">
+                {Object.entries(poolPreview).filter(([key]) => key !== 'message').map(([key, value]) => (
+                  <div key={key} className="flex justify-between">
+                    <span className="text-[12px] text-gray-400 capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                    <span className="text-[12px] font-semibold text-white">
+                      {typeof value === 'number' ? value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : String(value)}
+                    </span>
+                  </div>
+                ))}
+                {poolPreview.message && (
+                  <p className="text-[12px]  pt-1.5 border-t border-[#1e293b]">{poolPreview.message}</p>
+                )}
+              </div>
+            )}
             <div className="flex gap-3">
               <button
-                onClick={() => { setAddModal({ open: false, type: '' }); setModalError(''); }}
+                onClick={() => { setAddModal({ open: false, type: '' }); setModalError(''); setPoolPreview(null); }}
                 className="flex-1 px-4 py-3 rounded-lg text-[13px] font-bold cursor-pointer border border-[#1e293b] text-gray-300 hover:border-gray-400 transition-colors"
               >
                 Close
