@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { getTransactionsPdf, getTransactionsExcel, getRankRewardsPdf, getRankRewardsExcel, getSwpPackagesPdf, getSwpPackagesExcel, getMultilevelRewardsPdf, getMultilevelRewardsExcel, getApprovedWithdrawalsPdf, getApprovedWithdrawalsExcel, getTradingCapitalProfitPdf, getTradingCapitalProfitExcel } from '../api/report';
+import { useNavigate } from 'react-router-dom';
+import { getTransactionsPdf, getTransactionsExcel, getRankRewardsPdf, getRankRewardsExcel, getSwpPackagesPdf, getSwpPackagesExcel, getMultilevelRewardsPdf, getMultilevelRewardsExcel, getApprovedWithdrawalsPdf, getApprovedWithdrawalsExcel, getTradingCapitalProfitPdf, getTradingCapitalProfitExcel, getLayeredRewardsPdf, getLayeredRewardsExcel, getRoyaltyRewardsPdf, getRoyaltyRewardsExcel, getSpecialRewardsPdf, getSpecialRewardsExcel, getPoolRewardsPdf, getPoolRewardsExcel, getManagementFundPdf, getManagementFundExcel, getOperationFundPdf, getOperationFundExcel, getAllMembersPdf, getAllMembersExcel } from '../api/report';
 import { 
   FiSettings, FiBell, FiCalendar, FiArrowUpRight, 
   FiFileText, FiLayers, FiAward, FiShare2, 
@@ -17,6 +18,7 @@ const reportModules = [
     icon: FiFileText,
     tag: 'REAL-TIME',
     tagColor: 'text-[#00e396] bg-[#00e396]/10 border border-[#00e396]/20',
+    reportKey: 'transactions',
   },
   {
     id: 2,
@@ -25,6 +27,7 @@ const reportModules = [
     icon: TbDiamond,
     tag: 'PREMIUM',
     tagColor: 'text-gray-300 bg-gray-500/10 border border-gray-500/20',
+    reportKey: 'swp-packages',
   },
   {
     id: 3,
@@ -33,6 +36,7 @@ const reportModules = [
     icon: FiActivity,
     tag: 'CRITICAL',
     tagColor: 'text-[#00e396] bg-[#00e396]/10 border border-[#00e396]/20',
+    reportKey: 'trading-capital-profit',
   },
   {
     id: 4,
@@ -40,6 +44,7 @@ const reportModules = [
     description: 'Multifaceted reward stacking analysis across operational...',
     icon: FiLayers,
     tag: null,
+    reportKey: 'layered-rewards',
   },
   {
     id: 5,
@@ -47,6 +52,7 @@ const reportModules = [
     description: 'Recognition-based incentive distribution and rank...',
     icon: FiAward,
     tag: null,
+    reportKey: 'rank-rewards',
   },
   {
     id: 6,
@@ -54,6 +60,7 @@ const reportModules = [
     description: 'Network-wide distribution data for organizational incentive...',
     icon: FiShare2,
     tag: null,
+    reportKey: 'multilevel-rewards',
   },
   {
     id: 7,
@@ -61,6 +68,7 @@ const reportModules = [
     description: 'Perpetual royalty share reports for top-tier legacy participants.',
     icon: FiStar,
     tag: null,
+    reportKey: 'royalty-rewards',
   },
   {
     id: 8,
@@ -68,6 +76,7 @@ const reportModules = [
     description: 'Ad-hoc bonus distributions and seasonal promotional incentiv...',
     icon: FiGift,
     tag: null,
+    reportKey: 'special-rewards',
   },
   {
     id: 9,
@@ -76,6 +85,7 @@ const reportModules = [
     icon: FiDroplet,
     tag: 'LIQUIDITY',
     tagColor: 'text-[#0ea5e9] bg-[#0ea5e9]/10 border border-[#0ea5e9]/20',
+    reportKey: 'pool-rewards',
   },
   {
     id: 10,
@@ -83,6 +93,7 @@ const reportModules = [
     description: 'Administrative budget allocation and management overhead...',
     icon: FiBriefcase,
     tag: null,
+    reportKey: 'management-fund',
   },
   {
     id: 11,
@@ -90,6 +101,7 @@ const reportModules = [
     description: 'Internal treasury wallet movements and operational co...',
     icon: FiCreditCard,
     tag: null,
+    reportKey: 'operation-fund',
   },
   {
     id: 12,
@@ -98,6 +110,7 @@ const reportModules = [
     icon: FiCheckCircle,
     tag: 'VERIFIED',
     tagColor: 'text-[#00e396] bg-[#00e396]/10 border border-[#00e396]/20',
+    reportKey: 'approved-withdrawals',
   },
 ];
 
@@ -133,6 +146,10 @@ const exportHandlers = {
     excel: () => downloadFile(getTradingCapitalProfitExcel, 'trading_capital_profit_report.xlsx', EXCEL_TYPE),
     pdf: () => downloadFile(getTradingCapitalProfitPdf, 'trading_capital_profit_report.pdf', PDF_TYPE),
   },
+  4: {
+    excel: () => downloadFile(getLayeredRewardsExcel, 'layered_rewards_report.xlsx', EXCEL_TYPE),
+    pdf: () => downloadFile(getLayeredRewardsPdf, 'layered_rewards_report.pdf', PDF_TYPE),
+  },
   5: {
     excel: () => downloadFile(getRankRewardsExcel, 'rank_rewards_report.xlsx', EXCEL_TYPE),
     pdf: () => downloadFile(getRankRewardsPdf, 'rank_rewards_report.pdf', PDF_TYPE),
@@ -140,6 +157,26 @@ const exportHandlers = {
   6: {
     excel: () => downloadFile(getMultilevelRewardsExcel, 'multilevel_rewards_report.xlsx', EXCEL_TYPE),
     pdf: () => downloadFile(getMultilevelRewardsPdf, 'multilevel_rewards_report.pdf', PDF_TYPE),
+  },
+  7: {
+    excel: () => downloadFile(getRoyaltyRewardsExcel, 'royalty_rewards_report.xlsx', EXCEL_TYPE),
+    pdf: () => downloadFile(getRoyaltyRewardsPdf, 'royalty_rewards_report.pdf', PDF_TYPE),
+  },
+  8: {
+    excel: () => downloadFile(getSpecialRewardsExcel, 'special_rewards_report.xlsx', EXCEL_TYPE),
+    pdf: () => downloadFile(getSpecialRewardsPdf, 'special_rewards_report.pdf', PDF_TYPE),
+  },
+  9: {
+    excel: () => downloadFile(getPoolRewardsExcel, 'pool_rewards_report.xlsx', EXCEL_TYPE),
+    pdf: () => downloadFile(getPoolRewardsPdf, 'pool_rewards_report.pdf', PDF_TYPE),
+  },
+  10: {
+    excel: () => downloadFile(getManagementFundExcel, 'management_fund_report.xlsx', EXCEL_TYPE),
+    pdf: () => downloadFile(getManagementFundPdf, 'management_fund_report.pdf', PDF_TYPE),
+  },
+  11: {
+    excel: () => downloadFile(getOperationFundExcel, 'operation_fund_report.xlsx', EXCEL_TYPE),
+    pdf: () => downloadFile(getOperationFundPdf, 'operation_fund_report.pdf', PDF_TYPE),
   },
   12: {
     excel: () => downloadFile(getApprovedWithdrawalsExcel, 'approved_withdrawals_report.xlsx', EXCEL_TYPE),
@@ -149,6 +186,7 @@ const exportHandlers = {
 
 const Reports = () => {
   const [activeFilter, setActiveFilter] = useState('Monthly');
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col space-y-6 w-full max-w-350 mx-auto pb-10">
@@ -201,7 +239,7 @@ const Reports = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 mt-4">
+            <div className="grid grid-cols-3 gap-3 mt-4">
               <button
                 onClick={exportHandlers[module.id]?.excel}
                 className="flex items-center justify-center gap-2 py-2 bg-black/40 border border-[#1e293b] rounded-lg text-[10px] font-bold text-gray-300 hover:bg-[#1e293b]/60 hover:text-white transition-all cursor-pointer"
@@ -215,6 +253,12 @@ const Reports = () => {
               >
                 <BsFiletypePdf className="w-3.5 h-3.5 text-gray-400" />
                 PDF
+              </button>
+              <button
+                onClick={() => navigate(`/reports/${module.reportKey}`)}
+                className="flex items-center justify-center py-2 bg-[#00e396]/10 border border-[#00e396]/20 rounded-lg text-[10px] font-bold text-[#00e396] hover:bg-[#00e396]/20 transition-all cursor-pointer"
+              >
+                VIEW
               </button>
             </div>
           </div>
@@ -238,14 +282,23 @@ const Reports = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-2 py-3 bg-black/40 border border-[#1e293b] rounded-lg text-[11px] font-bold text-gray-300 hover:bg-[#1e293b]/60 hover:text-white transition-all cursor-pointer">
+          <div className="grid grid-cols-3 gap-4">
+            <button
+              onClick={() => downloadFile(getAllMembersExcel, 'all_members_report.xlsx', EXCEL_TYPE)}
+              className="flex items-center justify-center gap-2 py-3 bg-black/40 border border-[#1e293b] rounded-lg text-[11px] font-bold text-gray-300 hover:bg-[#1e293b]/60 hover:text-white transition-all cursor-pointer">
               <BsFiletypeXlsx className="w-3.5 h-3.5 text-gray-400" />
               EXCEL
             </button>
-            <button className="flex items-center justify-center gap-2 py-3 bg-black/40 border border-[#1e293b] rounded-lg text-[11px] font-bold text-gray-300 hover:bg-[#1e293b]/60 hover:text-white transition-all cursor-pointer">
+            <button
+              onClick={() => downloadFile(getAllMembersPdf, 'all_members_report.pdf', PDF_TYPE)}
+              className="flex items-center justify-center gap-2 py-3 bg-black/40 border border-[#1e293b] rounded-lg text-[11px] font-bold text-gray-300 hover:bg-[#1e293b]/60 hover:text-white transition-all cursor-pointer">
               <BsFiletypePdf className="w-3.5 h-3.5 text-gray-400" />
               PDF
+            </button>
+            <button
+              onClick={() => navigate('/reports/all-members')}
+              className="flex items-center justify-center py-3 bg-[#00e396]/10 border border-[#00e396]/20 rounded-lg text-[11px] font-bold text-[#00e396] hover:bg-[#00e396]/20 transition-all cursor-pointer">
+              VIEW
             </button>
           </div>
         </div>

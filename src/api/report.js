@@ -84,3 +84,105 @@ export const getTradingCapitalProfitExcel = async () => {
         responseType: "blob",
     });
 };
+
+export const getLayeredRewardsPdf = async () => {
+    return axiosInstance.get("/api/admin/reports/layered-rewards", {
+        params: { format: "pdf" },
+        responseType: "blob",
+    });
+};
+
+export const getLayeredRewardsExcel = async () => {
+    return axiosInstance.get("/api/admin/reports/layered-rewards", {
+        params: { format: "excel" },
+        responseType: "blob",
+    });
+};
+
+export const getRoyaltyRewardsPdf = async () => {
+    return axiosInstance.get("/api/admin/reports/royalty-rewards", {
+        params: { format: "pdf" },
+        responseType: "blob",
+    });
+};
+
+export const getRoyaltyRewardsExcel = async () => {
+    return axiosInstance.get("/api/admin/reports/royalty-rewards", {
+        params: { format: "excel" },
+        responseType: "blob",
+    });
+};
+
+export const getSpecialRewardsPdf = async () => {
+    return axiosInstance.get("/api/admin/reports/special-rewards", {
+        params: { format: "pdf" },
+        responseType: "blob",
+    });
+};
+
+export const getSpecialRewardsExcel = async () => {
+    return axiosInstance.get("/api/admin/reports/special-rewards", {
+        params: { format: "excel" },
+        responseType: "blob",
+    });
+};
+
+export const getPoolRewardsPdf = async () => {
+    return axiosInstance.get("/api/admin/reports/pool-rewards", {
+        params: { format: "pdf" },
+        responseType: "blob",
+    });
+};
+
+export const getPoolRewardsExcel = async () => {
+    return axiosInstance.get("/api/admin/reports/pool-rewards", {
+        params: { format: "excel" },
+        responseType: "blob",
+    });
+};
+
+export const getManagementFundPdf = async () => {
+    return axiosInstance.get("/api/admin/reports/management-fund", {
+        params: { format: "pdf" },
+        responseType: "blob",
+    });
+};
+
+export const getManagementFundExcel = async () => {
+    return axiosInstance.get("/api/admin/reports/management-fund", {
+        params: { format: "excel" },
+        responseType: "blob",
+    });
+};
+
+export const getOperationFundPdf = async () => {
+    return axiosInstance.get("/api/admin/reports/operation-fund", {
+        params: { format: "pdf" },
+        responseType: "blob",
+    });
+};
+
+export const getOperationFundExcel = async () => {
+    return axiosInstance.get("/api/admin/reports/operation-fund", {
+        params: { format: "excel" },
+        responseType: "blob",
+    });
+};
+
+export const getAllMembersPdf = async () => {
+    return axiosInstance.get("/api/admin/reports/all-members", {
+        params: { format: "pdf" },
+        responseType: "blob",
+    });
+};
+
+export const getAllMembersExcel = async () => {
+    return axiosInstance.get("/api/admin/reports/all-members", {
+        params: { format: "excel" },
+        responseType: "blob",
+    });
+};
+
+export const getReportData = async (reportKey, params = {}) => {
+    return axiosInstance.get(`/api/admin/reports/data/${reportKey}`, { params });
+};

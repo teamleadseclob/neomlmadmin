@@ -34,6 +34,9 @@ const Distribution = () => {
   const [showPoolConfirmModal, setShowPoolConfirmModal] = useState(false);
   const [distributingPool, setDistributingPool] = useState(false);
   const [multiAmount, setMultiAmount] = useState(0);
+  const [roiLastDistributed, setRoiLastDistributed] = useState(null);
+  const [poolUpdatedAt, setPoolUpdatedAt] = useState(null);
+  const [multiLastDistributed, setMultiLastDistributed] = useState(null);
   const [showMultiConfirmModal, setShowMultiConfirmModal] = useState(false);
   const [distributingMulti, setDistributingMulti] = useState(false);
   const [modalError, setModalError] = useState('');
@@ -43,6 +46,7 @@ const Distribution = () => {
       try {
         const response = await getDistributionData();
         setRoiDistributionData(response.data.data);
+        setRoiLastDistributed(response.data.data?.lastDistributedAt || null);
       } catch (error) {
         setError(error.response?.data?.message || 'Failed to load distribution data');
       }
@@ -61,6 +65,7 @@ const Distribution = () => {
       try {
         const res = await getPoolConfig();
         setPoolPercentage(res.data?.data?.percentage || 0);
+        setPoolUpdatedAt(res.data?.data?.updatedAt || null);
       } catch (err) {
         console.error(err);
       }
@@ -70,6 +75,7 @@ const Distribution = () => {
       try {
         const res = await getRankBonusAmountConfig();
         setMultiAmount(res.data?.data?.amount || 0);
+        setMultiLastDistributed(res.data?.data?.lastDistributedAt || null);
       } catch (err) {
         console.error(err);
       }
@@ -231,6 +237,12 @@ const Distribution = () => {
             Add ROI
           </button>
           <p className="mt-2 text-[10px] text-yellow-400 italic">1st and 16th of every month.</p>
+          {roiLastDistributed && (
+            <div className="mt-3 pt-3 border-t border-[#1e293b] flex items-center justify-between">
+              <span className="text-[10px] text-gray-400 uppercase tracking-wide">Last Update</span>
+              <span className="text-[11px] font-semibold text-white">{new Date(roiLastDistributed).toLocaleString()}</span>
+            </div>
+          )}
         </div>
 
         {/* Pool Distribution Card */}
@@ -249,6 +261,12 @@ const Distribution = () => {
             Add Pool Reward
           </button>
           <p className="mt-2 text-[10px] text-yellow-400 italic">1st of every month.</p>
+          {poolUpdatedAt && (
+            <div className="mt-3 pt-3 border-t border-[#1e293b] flex items-center justify-between">
+              <span className="text-[10px] text-gray-400 uppercase tracking-wide">Last Update</span>
+              <span className="text-[11px] font-semibold text-white">{new Date(poolUpdatedAt).toLocaleString()}</span>
+            </div>
+          )}
         </div>
 
         {/* Multi Reward Distribution Card */}
@@ -267,6 +285,12 @@ const Distribution = () => {
             Add Royality Reward
           </button>
           <p className="mt-2 text-[10px] text-yellow-400 italic">1st of every month.</p>
+          {multiLastDistributed && (
+            <div className="mt-3 pt-3 border-t border-[#1e293b] flex items-center justify-between">
+              <span className="text-[10px] text-gray-400 uppercase tracking-wide">Last Update</span>
+              <span className="text-[11px] font-semibold text-white">{new Date(multiLastDistributed).toLocaleString()}</span>
+            </div>
+          )}
         </div>
       </div>
 

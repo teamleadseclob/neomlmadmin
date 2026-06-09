@@ -1,8 +1,8 @@
 import axios from "axios"
 
 const axiosInstance = axios.create({
-  // baseURL: "http://192.168.29.36:5001",
-  baseURL: "https://backend.neofiacademy.com",
+  baseURL: "http://192.168.29.36:5001",
+  // baseURL: "https://backend.neofiacademy.com",
   headers: { "Content-Type": "application/json" },
 })
 

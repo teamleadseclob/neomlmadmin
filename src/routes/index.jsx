@@ -7,6 +7,7 @@ import BlockedMembers from "../pages/BlockedMembers"
 import Packages from "../pages/Packages"
 import Transactions from "../pages/Transactions"
 import Reports from "../pages/Reports"
+import ReportDetail from "../pages/ReportDetail"
 import Withdrawals from "../pages/Withdrawals"
 import Distribution from "../pages/Distribution"
 import Services from "../pages/Services"
@@ -42,6 +43,7 @@ const router = createBrowserRouter([
       { path: "/packages/:userId", element: <Packages /> },
       { path: "/transactions", element: <Transactions /> },
       { path: "/reports", element: <Reports /> },
+      { path: "/reports/:reportKey", element: <ReportDetail /> },
       { path: "/withdrawals", element: <Withdrawals /> },
       { path: "/distribution", element: <Distribution /> },
       { path: "/services", element: <Services /> },
