@@ -173,9 +173,7 @@ const Withdrawals = () => {
             Export data
             <FiDownload className="w-4 h-4" />
           </button>
-          <button className="flex items-center gap-2 px-5 py-3 bg-[#00e396] hover:bg-[#00c983] rounded-xl text-[13px] font-bold text-[#0a0f1e] transition-colors cursor-pointer shadow-[0_0_16px_rgba(0,227,150,0.2)]">
-            Create report
-          </button>
+          
         </div>
       </div>
 

@@ -68,9 +68,6 @@ const DashboardContent = () => {
           <button className="flex items-center gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg border border-[#1e293b] text-[12px] sm:text-[13px] text-white hover:bg-[#111827] transition-colors cursor-pointer">
             Export data <IoDownloadOutline className="text-base" />
           </button>
-          <button className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-[#25c3a3] text-[12px] sm:text-[13px] text-white font-medium hover:bg-[#1fa88c] transition-colors cursor-pointer">
-            Create report
-          </button>
           <button className="p-2 sm:p-2.5 rounded-lg border border-[#1e293b] text-[#94a3b8] hover:bg-[#111827] transition-colors cursor-pointer">
             <IoSettingsOutline className="text-lg" />
           </button>
