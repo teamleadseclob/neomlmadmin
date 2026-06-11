@@ -27,14 +27,7 @@ const Dashboard = () => (
             📅 Select date <span className="text-[#475569]">▾</span>
           </button>
         </div>
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border border-[#1e293b] text-[12px] sm:text-[13px] text-white hover:bg-[#111827] transition-colors cursor-pointer">
-            Export data <IoDownloadOutline className="text-base" />
-          </button>
-          <button className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-[#25c3a3] text-[12px] sm:text-[13px] text-white font-medium hover:bg-[#1fa88c] transition-colors cursor-pointer">
-            Create report
-          </button>
-        </div>
+        
       </div>
 
       <RecentOrders />
