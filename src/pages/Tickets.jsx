@@ -36,6 +36,7 @@ const Tickets = () => {
   const [updateStatus, setUpdateStatus] = useState("")
   const [adminReply, setAdminReply] = useState("")
   const [updating, setUpdating] = useState(false)
+  const [previewImage, setPreviewImage] = useState(null)
 
   const openModal = (ticket) => {
     setSelectedTicket(ticket)
@@ -153,6 +154,16 @@ const Tickets = () => {
 
                 <p className="text-[12px] text-gray-400 line-clamp-2 leading-relaxed">{ticket.message}</p>
 
+              {/* Image Thumbnail */}
+              {ticket.image && (
+                <button
+                  onClick={() => setPreviewImage(ticket.image)}
+                  className="block w-20 h-16 rounded-lg overflow-hidden border border-[#1e293b] hover:border-gray-500 transition-colors cursor-pointer"
+                >
+                  <img src={ticket.image} alt="attachment" crossOrigin="anonymous" className="w-full h-full object-cover" />
+                </button>
+              )}
+
               {/* Tags */}
               <div className="flex flex-wrap items-center gap-2">
                 <span className={`px-2.5 py-1 rounded text-[10px] font-bold tracking-wider uppercase ${statusStyle[ticket.status] || ""}`}>
@@ -191,6 +202,19 @@ const Tickets = () => {
               </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={() => setPreviewImage(null)}>
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+          <div className="relative max-w-3xl max-h-[90vh] p-2">
+            <button onClick={() => setPreviewImage(null)} className="absolute -top-3 -right-3 z-10 bg-[#1e293b] rounded-full p-1 text-gray-400 hover:text-white cursor-pointer">
+              <FiX className="w-4 h-4" />
+            </button>
+            <img src={previewImage} alt="preview" crossOrigin="anonymous" className="max-w-full max-h-[85vh] rounded-xl object-contain" onClick={(e) => e.stopPropagation()} />
+          </div>
         </div>
       )}
 

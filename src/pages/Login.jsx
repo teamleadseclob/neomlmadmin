@@ -4,6 +4,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi"
 import { loginApi } from "../api/authApi"
 
 import lgshadow from "../assets/page/lgshadow.png"
+import logoIcon from "../assets/icons/sidebar/logo.svg"
 
 const Login = () => {
   const navigate = useNavigate()
@@ -47,12 +48,11 @@ const Login = () => {
       <img src={lgshadow} alt="" className="absolute bottom-[-130%] left-[-50%] w-full h-auto pointer-events-none" />
       <img src={lgshadow} alt="" className="absolute top-[-130%] left-1/2 -translate-x-1/2 w-full h-auto pointer-events-none" />
 
-      <div className="absolute top-8 left-8 z-20">
-        <div className="text-[#2dd4a8] text-[22px] font-bold tracking-[0.25em] leading-none">
-          NEOFI
-        </div>
-        <div className="text-[#5a7a72] text-[10px] tracking-[0.35em] uppercase mt-1.5">
-          Financial Observatory
+      <div className="absolute top-8 left-8 z-20 flex items-center gap-3">
+        <img src={logoIcon} alt="NeoFi" className="w-9 h-9" />
+        <div>
+          <div className="text-white text-[13px] font-bold leading-tight">NEOFI ACADAMY</div>
+          <div className="text-[#25c3a3] text-[9px] tracking-[0.18em] uppercase mt-0.5 font-medium">Network Admin</div>
         </div>
       </div>
 
