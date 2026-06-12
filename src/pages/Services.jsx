@@ -3,13 +3,21 @@ import {
   FiSettings, FiBell, FiUploadCloud, 
   FiChevronDown, FiAward, FiBook, FiTool
 } from 'react-icons/fi';
-import { createEvent } from '../api/services';
+import { createEvent, uploadFile } from '../api/services';
 
 const Services = () => {
   const [activeTab, setActiveTab] = useState('Contest');
   const [dragOver, setDragOver] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
+  const imageUrlRef = useRef('');
+  const [imageUploading, setImageUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState('');
+  const pdfUrlRef = useRef('');
+  const [pdfUploading, setPdfUploading] = useState(false);
+  const pdfInputRef = useRef(null);
 
   // Contest form state
   const [contestForm, setContestForm] = useState({
@@ -75,9 +83,40 @@ const Services = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = async (e) => {
     const file = e.target.files[0];
-    if (file) setUploadedFile(file);
+    if (!file) return;
+    setUploadedFile(file);
+    setImageUploading(true);
+    try {
+      const res = await uploadFile(file);
+      const url = res.data?.data?.url || res.data?.url || '';
+      setImageUrl(url);
+      imageUrlRef.current = url;
+    } catch (err) {
+      alert(err.response?.data?.message || 'Image upload failed');
+      setUploadedFile(null);
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
+  const handlePdfSelect = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPdfFile(file);
+    setPdfUploading(true);
+    try {
+      const res = await uploadFile(file);
+      const url = res.data?.data?.url || res.data?.url || res.data?.fileUrl || '';
+      setPdfUrl(url);
+      pdfUrlRef.current = url;
+    } catch (err) {
+      alert(err.response?.data?.message || 'PDF upload failed');
+      setPdfFile(null);
+    } finally {
+      setPdfUploading(false);
+    }
   };
 
   const tabs = [
@@ -194,44 +233,58 @@ const Services = () => {
             />
           </div>
 
-          {/* Background Image Upload */}
-          <div className="mb-6">
-            <label htmlFor='Background Image' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
-              Background Image Upload
-            </label>
-            <button
-              type="button"
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              className={`w-full py-10 bg-[#0a0f1e] border-2 border-dashed rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer ${
-                dragOver
-                  ? 'border-[#25c3a3] bg-[#25c3a3]/5'
-                  : 'border-[#1e293b] hover:border-gray-600'
-              }`}
-              onClick={handleBrowseClick}
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileSelect}
-                accept="image/png,image/jpeg,image/webp"
-                className="hidden"
-              />
-              <FiUploadCloud className="w-8 h-8 text-gray-500 mb-3" />
-              {uploadedFile ? (
-                <p className="text-[13px] text-[#25c3a3] font-medium">{uploadedFile.name}</p>
-              ) : (
-                <>
-                  <p className="text-[13px] text-gray-400">
-                    Drag and drop assets here, or <span className="text-[#25c3a3] font-semibold hover:underline">browse files</span>
-                  </p>
-                  <p className="text-[10px] text-gray-500 mt-1.5 tracking-wide uppercase">
-                    Recommended: 1920x800 PNG/WEBP
-                  </p>
-                </>
-              )}
-            </button>
+          {/* Image + PDF Upload — side by side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">Background Image</label>
+              <button
+                type="button"
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onClick={handleBrowseClick}
+                className={`w-full py-8 bg-[#0a0f1e] border-2 border-dashed rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer ${
+                  dragOver ? 'border-[#25c3a3] bg-[#25c3a3]/5' : 'border-[#1e293b] hover:border-gray-600'
+                }`}
+              >
+                <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/png,image/jpeg,image/webp" className="hidden" />
+                <FiUploadCloud className="w-7 h-7 text-gray-500 mb-2" />
+                {imageUploading ? (
+                  <p className="text-[12px] text-gray-400">Uploading...</p>
+                ) : uploadedFile ? (
+                  <p className="text-[12px] text-[#25c3a3] font-medium px-2 text-center truncate w-full">{uploadedFile.name}</p>
+                ) : (
+                  <>
+                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span></p>
+                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PNG / WEBP</p>
+                  </>
+                )}
+              </button>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">PDF Upload</label>
+              <button
+                type="button"
+                onClick={() => pdfInputRef.current?.click()}
+                className="w-full py-8 bg-[#0a0f1e] border-2 border-dashed border-[#1e293b] hover:border-gray-600 rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer"
+              >
+                <input type="file" ref={pdfInputRef} onChange={handlePdfSelect} accept="application/pdf" className="hidden" />
+                <FiUploadCloud className="w-7 h-7 text-gray-500 mb-2" />
+                {pdfUploading ? (
+                  <p className="text-[12px] text-gray-400">Uploading...</p>
+                ) : pdfFile ? (
+                  <>
+                    <p className="text-[12px] text-[#25c3a3] font-medium px-2 text-center truncate w-full">{pdfFile.name}</p>
+                    {pdfUrl && <p className="text-[10px] text-gray-500 mt-1">Uploaded ✓</p>}
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span></p>
+                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PDF only</p>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Start Date & End Date */}
@@ -278,10 +331,11 @@ const Services = () => {
                   title: contestForm.campaignTitle,
                   subTitle: contestForm.subTitle,
                   description: contestForm.description,
-                  imageUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
+                  imageUrl: imageUrlRef.current,
                   mediaUrl: contestForm.mediaUrl,
                   startDate: contestForm.startDate ? new Date(contestForm.startDate).toISOString() : '',
                   endDate: contestForm.endDate ? new Date(contestForm.endDate).toISOString() : '',
+                  ...(pdfUrlRef.current && { pdfUrl: pdfUrlRef.current }),
                 };
                 try {
                   await createEvent(payload);
@@ -371,44 +425,58 @@ const Services = () => {
             />
           </div>
 
-          {/* Background Image Upload */}
-          <div className="mb-6">
-            <label htmlFor='Background Image' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
-              Background Image Upload
-            </label>
-            <button
-              type="button"
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              className={`w-full py-10 bg-[#0a0f1e] border-2 border-dashed rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer ${
-                dragOver
-                  ? 'border-[#25c3a3] bg-[#25c3a3]/5'
-                  : 'border-[#1e293b] hover:border-gray-600'
-              }`}
-              onClick={handleBrowseClick}
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileSelect}
-                accept="image/png,image/jpeg,image/webp"
-                className="hidden"
-              />
-              <FiUploadCloud className="w-8 h-8 text-gray-500 mb-3" />
-              {uploadedFile ? (
-                <p className="text-[13px] text-[#25c3a3] font-medium">{uploadedFile.name}</p>
-              ) : (
-                <>
-                  <p className="text-[13px] text-gray-400">
-                    Drag and drop assets here, or <span className="text-[#25c3a3] font-semibold hover:underline">browse files</span>
-                  </p>
-                  <p className="text-[10px] text-gray-500 mt-1.5 tracking-wide uppercase">
-                    Recommended: 1920x800 PNG/WEBP
-                  </p>
-                </>
-              )}
-            </button>
+          {/* Image + PDF Upload — side by side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">Background Image</label>
+              <button
+                type="button"
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onClick={handleBrowseClick}
+                className={`w-full py-8 bg-[#0a0f1e] border-2 border-dashed rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer ${
+                  dragOver ? 'border-[#25c3a3] bg-[#25c3a3]/5' : 'border-[#1e293b] hover:border-gray-600'
+                }`}
+              >
+                <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/png,image/jpeg,image/webp" className="hidden" />
+                <FiUploadCloud className="w-7 h-7 text-gray-500 mb-2" />
+                {imageUploading ? (
+                  <p className="text-[12px] text-gray-400">Uploading...</p>
+                ) : uploadedFile ? (
+                  <p className="text-[12px] text-[#25c3a3] font-medium px-2 text-center truncate w-full">{uploadedFile.name}</p>
+                ) : (
+                  <>
+                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span></p>
+                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PNG / WEBP</p>
+                  </>
+                )}
+              </button>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">PDF Upload</label>
+              <button
+                type="button"
+                onClick={() => pdfInputRef.current?.click()}
+                className="w-full py-8 bg-[#0a0f1e] border-2 border-dashed border-[#1e293b] hover:border-gray-600 rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer"
+              >
+                <input type="file" ref={pdfInputRef} onChange={handlePdfSelect} accept="application/pdf" className="hidden" />
+                <FiUploadCloud className="w-7 h-7 text-gray-500 mb-2" />
+                {pdfUploading ? (
+                  <p className="text-[12px] text-gray-400">Uploading...</p>
+                ) : pdfFile ? (
+                  <>
+                    <p className="text-[12px] text-[#25c3a3] font-medium px-2 text-center truncate w-full">{pdfFile.name}</p>
+                    {pdfUrl && <p className="text-[10px] text-gray-500 mt-1">Uploaded ✓</p>}
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span></p>
+                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PDF only</p>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Price & Duration */}
@@ -490,12 +558,13 @@ const Services = () => {
                   packageName: learningForm.packageName,
                   category: learningForm.category,
                   description: learningForm.description,
-                  imageUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
+                  imageUrl: imageUrlRef.current,
                   mediaUrl: learningForm.mediaUrl,
                   price: Number(learningForm.price) || 0,
                   duration: learningForm.duration,
                   accessLevel: learningForm.accessLevel,
                   status: learningForm.status,
+                  ...(pdfUrlRef.current && { pdfUrl: pdfUrlRef.current }),
                 };
                 try {
                   await createEvent(payload);
@@ -586,44 +655,58 @@ const Services = () => {
             />
           </div>
 
-          {/* Background Image Upload */}
-          <div className="mb-6">
-            <label htmlFor='Background Image' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
-              Background Image Upload
-            </label>
-            <button
-              type="button"
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              className={`w-full py-10 bg-[#0a0f1e] border-2 border-dashed rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer ${
-                dragOver
-                  ? 'border-[#25c3a3] bg-[#25c3a3]/5'
-                  : 'border-[#1e293b] hover:border-gray-600'
-              }`}
-              onClick={handleBrowseClick}
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileSelect}
-                accept="image/png,image/jpeg,image/webp"
-                className="hidden"
-              />
-              <FiUploadCloud className="w-8 h-8 text-gray-500 mb-3" />
-              {uploadedFile ? (
-                <p className="text-[13px] text-[#25c3a3] font-medium">{uploadedFile.name}</p>
-              ) : (
-                <>
-                  <p className="text-[13px] text-gray-400">
-                    Drag and drop assets here, or <span className="text-[#25c3a3] font-semibold hover:underline">browse files</span>
-                  </p>
-                  <p className="text-[10px] text-gray-500 mt-1.5 tracking-wide uppercase">
-                    Recommended: 1920x800 PNG/WEBP
-                  </p>
-                </>
-              )}
-            </button>
+          {/* Image + PDF Upload — side by side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">Background Image</label>
+              <button
+                type="button"
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onClick={handleBrowseClick}
+                className={`w-full py-8 bg-[#0a0f1e] border-2 border-dashed rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer ${
+                  dragOver ? 'border-[#25c3a3] bg-[#25c3a3]/5' : 'border-[#1e293b] hover:border-gray-600'
+                }`}
+              >
+                <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/png,image/jpeg,image/webp" className="hidden" />
+                <FiUploadCloud className="w-7 h-7 text-gray-500 mb-2" />
+                {imageUploading ? (
+                  <p className="text-[12px] text-gray-400">Uploading...</p>
+                ) : uploadedFile ? (
+                  <p className="text-[12px] text-[#25c3a3] font-medium px-2 text-center truncate w-full">{uploadedFile.name}</p>
+                ) : (
+                  <>
+                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span></p>
+                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PNG / WEBP</p>
+                  </>
+                )}
+              </button>
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">PDF Upload</label>
+              <button
+                type="button"
+                onClick={() => pdfInputRef.current?.click()}
+                className="w-full py-8 bg-[#0a0f1e] border-2 border-dashed border-[#1e293b] hover:border-gray-600 rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer"
+              >
+                <input type="file" ref={pdfInputRef} onChange={handlePdfSelect} accept="application/pdf" className="hidden" />
+                <FiUploadCloud className="w-7 h-7 text-gray-500 mb-2" />
+                {pdfUploading ? (
+                  <p className="text-[12px] text-gray-400">Uploading...</p>
+                ) : pdfFile ? (
+                  <>
+                    <p className="text-[12px] text-[#25c3a3] font-medium px-2 text-center truncate w-full">{pdfFile.name}</p>
+                    {pdfUrl && <p className="text-[10px] text-gray-500 mt-1">Uploaded ✓</p>}
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span></p>
+                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PDF only</p>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Access Level & Status */}
@@ -676,10 +759,11 @@ const Services = () => {
                   toolName: toolsForm.toolName,
                   toolType: toolsForm.toolType,
                   description: toolsForm.description,
-                  imageUrl: uploadedFile ? URL.createObjectURL(uploadedFile) : '',
+                  imageUrl: imageUrlRef.current,
                   mediaUrl: toolsForm.mediaUrl,
                   accessLevel: toolsForm.accessLevel,
                   status: toolsForm.status,
+                  ...(pdfUrlRef.current && { pdfUrl: pdfUrlRef.current }),
                 };
                 try {
                   await createEvent(payload);
