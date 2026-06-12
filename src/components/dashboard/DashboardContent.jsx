@@ -66,12 +66,6 @@ const DashboardContent = () => {
         </div>
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
         
-          <button className="p-2 sm:p-2.5 rounded-lg border border-[#1e293b] text-[#94a3b8] hover:bg-[#111827] transition-colors cursor-pointer">
-            <IoSettingsOutline className="text-lg" />
-          </button>
-          <button className="p-2 sm:p-2.5 rounded-lg border border-[#1e293b] text-[#94a3b8] hover:bg-[#111827] transition-colors cursor-pointer">
-            <IoNotificationsOutline className="text-lg" />
-          </button>
         </div>
       </div>
 
