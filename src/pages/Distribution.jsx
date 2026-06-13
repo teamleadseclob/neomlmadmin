@@ -139,6 +139,9 @@ const Distribution = () => {
     try {
       setDistributing(true);
       await distributeRoi();
+      const res = await getDistributionData();
+      setRoiDistributionData(res.data.data);
+      setRoiLastDistributed(res.data.data?.lastDistributedAt || null);
       setShowConfirmModal(false);
       setModalError('');
       toast.success('ROI distributed successfully!');
@@ -536,6 +539,9 @@ const Distribution = () => {
                   try {
                     setDistributingPool(true);
                     await distributePoolFund();
+                    const res = await getPoolConfig();
+                    setPoolPercentage(res.data?.data?.percentage || 0);
+                    setPoolUpdatedAt(res.data?.data?.updatedAt || null);
                     setShowPoolConfirmModal(false);
                     setModalError('');
                     toast.success('Pool Reward distributed successfully!');
