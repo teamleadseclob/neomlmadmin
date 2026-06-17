@@ -149,9 +149,7 @@ const Withdrawals = () => {
           <button className="p-2.5 rounded-full bg-[#1e293b]/50 hover:bg-[#1e293b] border border-gray-700/50 text-gray-300 transition-all cursor-pointer">
             <FiSettings className="w-5 h-5" />
           </button>
-          <button className="p-2.5 rounded-full bg-[#1e293b]/50 hover:bg-[#1e293b] border border-gray-700/50 text-gray-300 transition-all cursor-pointer relative">
-            <FiBell className="w-5 h-5" />
-          </button>
+          
         </div>
       </div>
 
@@ -165,16 +163,7 @@ const Withdrawals = () => {
             className="w-full pl-11 pr-4 py-3.5 bg-[#0f1522] border border-[#1e293b] rounded-xl text-[13px] text-gray-300 placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-colors"
           />
         </div>
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            onClick={handleExportPDF}
-            className="flex items-center gap-2 px-5 py-3 bg-[#0f1522] border border-[#1e293b] rounded-xl text-[13px] font-semibold text-gray-300 hover:bg-[#151c2b] transition-colors cursor-pointer"
-          >
-            Export data
-            <FiDownload className="w-4 h-4" />
-          </button>
-          
-        </div>
+       
       </div>
 
       {/* Stats Cards */}

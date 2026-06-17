@@ -1,8 +1,10 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import PropTypes from "prop-types"
 import { NavLink, useLocation } from "react-router-dom"
 import { IoChevronDown, IoCloseOutline } from "react-icons/io5"
 
+import { getTicketUnreadCount, markAllTicketsRead } from "../../api/tickets"
+import { getMarketInterestUnreadCount, markAllMarketInterestsRead } from "../../api/tradingpartners"
 import dashboardIcon from "../../assets/icons/sidebar/dashboard.png"
 import membersIcon from "../../assets/icons/sidebar/members.png"
 import packagesIcon from "../../assets/icons/sidebar/packages.png"
@@ -44,6 +46,13 @@ const menuItems = [
 const Sidebar = ({ isOpen, onClose, onLogout }) => {
   const { pathname } = useLocation()
   const [membersOpen, setMembersOpen] = useState(pathname.startsWith("/members"))
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [tradingUnreadCount, setTradingUnreadCount] = useState(0)
+
+  useEffect(() => {
+    getTicketUnreadCount().then(res => setUnreadCount(res.data.data.unread)).catch(() => {})
+    getMarketInterestUnreadCount().then(res => setTradingUnreadCount(res.data.data.unread)).catch(() => {})
+  }, [])
 
   const handleNavClick = () => {
     // Close sidebar on mobile after navigation
@@ -141,7 +150,17 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
               key={item.path}
               to={item.path}
               end={item.path === "/"}
-              onClick={handleNavClick}
+              onClick={() => {
+                if (item.path === "/tickets" && unreadCount > 0) {
+                  markAllTicketsRead().catch(() => {})
+                  setUnreadCount(0)
+                }
+                if (item.path === "/trading-partners" && tradingUnreadCount > 0) {
+                  markAllMarketInterestsRead().catch(() => {})
+                  setTradingUnreadCount(0)
+                }
+                handleNavClick()
+              }}
               className={({ isActive }) =>
                 `flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] transition-all duration-200 group ${
                   isActive
@@ -154,6 +173,16 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
                 <>
                   <img src={item.icon} alt={item.name} className={`w-4 h-4 ${isActive ? "brightness-150" : "opacity-80 group-hover:opacity-100"}`} />
                   <span>{item.name}</span>
+                  {item.path === "/tickets" && unreadCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      {unreadCount}
+                    </span>
+                  )}
+                  {item.path === "/trading-partners" && tradingUnreadCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      {tradingUnreadCount}
+                    </span>
+                  )}
                 </>
               )}
             </NavLink>

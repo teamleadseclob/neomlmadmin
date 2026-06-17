@@ -39,7 +39,7 @@ const EXTRA_FILTERS = {
 // fixed column definitions per report: { key, label, render(row) }
 const REPORT_COLUMNS = {
   'transactions': [
-    { key: 'txDate',        label: 'Date',       render: (r) => r.txDate ? new Date(r.txDate).toLocaleDateString() : '—' },
+    { key: 'txDate',        label: 'Date',       render: (r) => r.txDate ? new Date(r.txDate).toLocaleString() : '—' },
     { key: 'userName',      label: 'User',       render: (r) => r.userId?.name || '—' },
     { key: 'userIdCode',    label: 'User ID',    render: (r) => r.userId?.userId || '—' },
     { key: 'txAmount',      label: 'Amount',     render: (r) => r.txAmount?.toLocaleString() ?? '—' },
@@ -48,7 +48,7 @@ const REPORT_COLUMNS = {
     { key: 'walletAfter',   label: 'SWP After',  render: (r) => r.walletAfter?.toLocaleString() ?? '—' },
   ],
   'layered-rewards': [
-    { key: 'createdAt',     label: 'Date',       render: (r) => r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '—' },
+    { key: 'createdAt',     label: 'Date',       render: (r) => r.createdAt ? new Date(r.createdAt).toLocaleString() : '—' },
     { key: 'earnerName',    label: 'User',       render: (r) => r.earnerId?.name || '—' },
     { key: 'earnerUserId',  label: 'User ID',    render: (r) => r.earnerId?.userId || '—' },
     { key: 'level',         label: 'Level',      render: (r) => r.level ?? '—' },
@@ -58,7 +58,7 @@ const REPORT_COLUMNS = {
     { key: 'netAmount',     label: 'Net',        render: (r) => r.netAmount != null ? `$${r.netAmount}` : '—' },
   ],
   'swp-packages': [
-    { key: 'createdAt',    label: 'Date',       render: (r) => r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '—' },
+    { key: 'createdAt',    label: 'Date',       render: (r) => r.createdAt ? new Date(r.createdAt).toLocaleString() : '—' },
     { key: 'userName',     label: 'User',       render: (r) => r.userId?.name || '—' },
     { key: 'userIdCode',   label: 'User ID',    render: (r) => r.userId?.userId || '—' },
     { key: 'amount',       label: 'Amount',     render: (r) => r.amount != null ? `$${r.amount}` : '—' },
@@ -67,7 +67,7 @@ const REPORT_COLUMNS = {
     { key: 'swpAfter',     label: 'SWP After',  render: (r) => r.swpAfter ?? '—' },
   ],
   'trading-capital-profit': [
-    { key: 'createdAt',           label: 'Date',       render: (r) => r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '—' },
+    { key: 'createdAt',           label: 'Date',       render: (r) => r.createdAt ? new Date(r.createdAt).toLocaleString() : '—' },
     { key: 'userName',            label: 'User',       render: (r) => r.userId?.name || '—' },
     { key: 'userIdCode',          label: 'User ID',    render: (r) => r.userId?.userId || '—' },
     { key: 'totalInvestedAmount', label: 'Invested',   render: (r) => r.totalInvestedAmount != null ? `$${r.totalInvestedAmount}` : '—' },
@@ -77,7 +77,7 @@ const REPORT_COLUMNS = {
     { key: 'roiCapped',           label: 'Capped',     render: (r) => r.roiCapped != null ? (r.roiCapped ? 'Yes' : 'No') : '—' },
   ],
   'multilevel-rewards': [
-    { key: 'createdAt',    label: 'Date',       render: (r) => r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '—' },
+    { key: 'createdAt',    label: 'Date',       render: (r) => r.createdAt ? new Date(r.createdAt).toLocaleString() : '—' },
     { key: 'earnerName',   label: 'Earner',     render: (r) => r.earnerId?.name || '—' },
     { key: 'earnerId',     label: 'Earner ID',  render: (r) => r.earnerId?.userId || '—' },
     { key: 'fromUser',     label: 'From User',  render: (r) => r.fromUserId?.userId || '—' },
@@ -204,6 +204,7 @@ const ReportDetail = () => {
     if (col === '__userId') return row.userId?.userId || '—';
     const val = row[col];
     if (val === null || val === undefined) return '—';
+    if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(val)) return new Date(val).toLocaleString();
     if (typeof val === 'object' && !Array.isArray(val)) {
       if (val.name && val.userId) return `${val.name} (${val.userId})`;
       if (val.name) return val.name;

@@ -5,3 +5,9 @@ export const getMarketInterests = (page = 1, limit = 20) =>
 
 export const acceptMarketInterest = (id, data) =>
   axiosInstance.patch(`/api/admin/market/interests/${id}/accept`, data);
+
+export const getMarketInterestUnreadCount = () =>
+  axiosInstance.get("/api/admin/market/interests/counts");
+
+export const markAllMarketInterestsRead = () =>
+  axiosInstance.patch("/api/admin/market/interests/read-all");

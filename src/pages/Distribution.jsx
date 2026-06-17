@@ -12,6 +12,16 @@ import { getDistributionData , updateRoiDistributionData, distributeRoi , getDis
 import { getDashboardDataApi } from '../api/dashboardApi';
 
 
+const formatDistributeDate = (date) => {
+  const d = new Date(date);
+  const day = d.getDate();
+  const suffix = day === 1 || day === 21 || day === 31 ? 'st' : day === 2 || day === 22 ? 'nd' : day === 3 || day === 23 ? 'rd' : 'th';
+  const month = d.toLocaleString('en-US', { month: 'short' });
+  const year = d.getFullYear();
+  const time = d.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
+  return `${day}${suffix} ${month} ${year} ${time}`;
+};
+
 const Distribution = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [history, setHistory] = useState([]);
@@ -138,10 +148,8 @@ const Distribution = () => {
   const handleDistributeROI = async () => {
     try {
       setDistributing(true);
-      await distributeRoi();
-      const res = await getDistributionData();
-      setRoiDistributionData(res.data.data);
-      setRoiLastDistributed(res.data.data?.lastDistributedAt || null);
+      const distributeRes = await distributeRoi();
+      setRoiLastDistributed(distributeRes.data?.data?.distributedAt || new Date().toISOString());
       setShowConfirmModal(false);
       setModalError('');
       toast.success('ROI distributed successfully!');
@@ -244,8 +252,8 @@ const Distribution = () => {
           <p className="mt-2 text-[10px] text-yellow-400 italic">1st and 16th of every month.</p>
           {roiLastDistributed && (
             <div className="mt-3 pt-3 border-t border-[#1e293b] flex items-center justify-between">
-              <span className="text-[10px] text-gray-400 uppercase tracking-wide">Last Update</span>
-              <span className="text-[11px] font-semibold text-white">{new Date(roiLastDistributed).toLocaleString()}</span>
+              <span className="text-[10px] text-gray-400 uppercase tracking-wide">Last Distributed</span>
+              <span className="text-[11px] font-semibold text-white">{formatDistributeDate(roiLastDistributed)}</span>
             </div>
           )}
         </div>
@@ -268,8 +276,8 @@ const Distribution = () => {
           <p className="mt-2 text-[10px] text-yellow-400 italic">1st of every month.</p>
           {poolUpdatedAt && (
             <div className="mt-3 pt-3 border-t border-[#1e293b] flex items-center justify-between">
-              <span className="text-[10px] text-gray-400 uppercase tracking-wide">Last Update</span>
-              <span className="text-[11px] font-semibold text-white">{new Date(poolUpdatedAt).toLocaleString()}</span>
+              <span className="text-[10px] text-gray-400 uppercase tracking-wide">Last Distributed</span>
+              <span className="text-[11px] font-semibold text-white">{formatDistributeDate(poolUpdatedAt)}</span>
             </div>
           )}
         </div>
@@ -292,8 +300,8 @@ const Distribution = () => {
           <p className="mt-2 text-[10px] text-yellow-400 italic">1st of every month.</p>
           {multiLastDistributed && (
             <div className="mt-3 pt-3 border-t border-[#1e293b] flex items-center justify-between">
-              <span className="text-[10px] text-gray-400 uppercase tracking-wide">Last Update</span>
-              <span className="text-[11px] font-semibold text-white">{new Date(multiLastDistributed).toLocaleString()}</span>
+              <span className="text-[10px] text-gray-400 uppercase tracking-wide">Last Distributed</span>
+              <span className="text-[11px] font-semibold text-white">{formatDistributeDate(multiLastDistributed)}</span>
             </div>
           )}
         </div>
@@ -495,7 +503,8 @@ const Distribution = () => {
                 onClick={async () => {
                   try {
                     setDistributingMulti(true);
-                    await distributeMultiReward();
+                    const multiRes = await distributeMultiReward();
+                    setMultiLastDistributed(multiRes.data?.data?.distributedAt || new Date().toISOString());
                     setShowMultiConfirmModal(false);
                     setModalError('');
                     toast.success('Royality Reward distributed successfully!');
@@ -538,10 +547,8 @@ const Distribution = () => {
                 onClick={async () => {
                   try {
                     setDistributingPool(true);
-                    await distributePoolFund();
-                    const res = await getPoolConfig();
-                    setPoolPercentage(res.data?.data?.percentage || 0);
-                    setPoolUpdatedAt(res.data?.data?.updatedAt || null);
+                    const poolRes = await distributePoolFund();
+                    setPoolUpdatedAt(poolRes.data?.data?.distributedAt || new Date().toISOString());
                     setShowPoolConfirmModal(false);
                     setModalError('');
                     toast.success('Pool Reward distributed successfully!');
