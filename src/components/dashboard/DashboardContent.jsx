@@ -61,7 +61,7 @@ const DashboardContent = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-[22px] sm:text-[26px] font-bold text-white">Welcome back, John</h1>
+          <h1 className="text-[22px] sm:text-[26px] font-bold text-white">Welcome back, NEOFI ACADAMY</h1>
           <p className="text-[12px] sm:text-[13px] text-[#94a3b8] mt-0.5">Measure your advertising ROI and report website traffic.</p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
