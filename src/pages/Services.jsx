@@ -8,16 +8,31 @@ import { createEvent, uploadFile } from '../api/services';
 const Services = () => {
   const [activeTab, setActiveTab] = useState('Contest');
   const [dragOver, setDragOver] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState('');
-  const imageUrlRef = useRef('');
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [imageUrls, setImageUrls] = useState([]);
+  const imageUrlsRef = useRef([]);
   const [imageUploading, setImageUploading] = useState(false);
   const fileInputRef = useRef(null);
-  const [pdfFile, setPdfFile] = useState(null);
-  const [pdfUrl, setPdfUrl] = useState('');
-  const pdfUrlRef = useRef('');
-  const [pdfUploading, setPdfUploading] = useState(false);
-  const pdfInputRef = useRef(null);
+  // Contest multiple PDFs
+  const [contestPdfFiles, setContestPdfFiles] = useState([]);
+  const [contestPdfUrls, setContestPdfUrls] = useState([]);
+  const contestPdfUrlsRef = useRef([]);
+  const [contestPdfUploading, setContestPdfUploading] = useState(false);
+  const contestPdfInputRef = useRef(null);
+
+  // Learning multiple PDFs
+  const [learningPdfFiles, setLearningPdfFiles] = useState([]);
+  const [learningPdfUrls, setLearningPdfUrls] = useState([]);
+  const learningPdfUrlsRef = useRef([]);
+  const [learningPdfUploading, setLearningPdfUploading] = useState(false);
+  const learningPdfInputRef = useRef(null);
+
+  // Tools multiple PDFs
+  const [toolsPdfFiles, setToolsPdfFiles] = useState([]);
+  const [toolsPdfUrls, setToolsPdfUrls] = useState([]);
+  const toolsPdfUrlsRef = useRef([]);
+  const [toolsPdfUploading, setToolsPdfUploading] = useState(false);
+  const toolsPdfInputRef = useRef(null);
 
   // Contest form state
   const [contestForm, setContestForm] = useState({
@@ -25,6 +40,7 @@ const Services = () => {
     subTitle: 'Quantum Observatory Cup',
     description: '',
     mediaUrl: '',
+    googleMeetLink: '',
     startDate: '',
     endDate: '',
   });
@@ -35,6 +51,7 @@ const Services = () => {
     category: 'cryptocurrency_basics',
     description: '',
     mediaUrl: '',
+    googleMeetLink: '',
     price: '',
     duration: '',
     accessLevel: 'all_members',
@@ -47,6 +64,7 @@ const Services = () => {
     toolType: 'analytics',
     description: '',
     mediaUrl: '',
+    googleMeetLink: '',
     accessLevel: 'all_members',
     status: 'active',
   });
@@ -63,11 +81,12 @@ const Services = () => {
     setToolsForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     setDragOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file) setUploadedFile(file);
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    if (!files.length) return;
+    await uploadImages(files);
   };
 
   const handleDragOver = (e) => {
@@ -83,40 +102,112 @@ const Services = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileSelect = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setUploadedFile(file);
+  const uploadImages = async (files) => {
     setImageUploading(true);
     try {
-      const res = await uploadFile(file);
-      const url = res.data?.data?.url || res.data?.url || '';
-      setImageUrl(url);
-      imageUrlRef.current = url;
+      const res = await uploadFile(files);
+      const urls = res.data?.urls ?? res.data?.data?.urls ?? [];
+      setUploadedFiles(prev => [...prev, ...files]);
+      setImageUrls(prev => [...prev, ...urls]);
+      imageUrlsRef.current = [...imageUrlsRef.current, ...urls];
     } catch (err) {
       alert(err.response?.data?.message || 'Image upload failed');
-      setUploadedFile(null);
     } finally {
       setImageUploading(false);
     }
   };
 
-  const handlePdfSelect = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setPdfFile(file);
-    setPdfUploading(true);
+  const handleFileSelect = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    await uploadImages(files);
+    e.target.value = '';
+  };
+
+  const removeImage = (index) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    const updated = imageUrlsRef.current.filter((_, i) => i !== index);
+    imageUrlsRef.current = updated;
+    setImageUrls(updated);
+  };
+
+  const handleContestPdfSelect = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    setContestPdfUploading(true);
     try {
-      const res = await uploadFile(file);
-      const url = res.data?.data?.url || res.data?.url || res.data?.fileUrl || '';
-      setPdfUrl(url);
-      pdfUrlRef.current = url;
+      const res = await uploadFile(files);
+      const urls = res.data?.urls ?? res.data?.data?.urls ?? [];
+      setContestPdfFiles(prev => [...prev, ...files]);
+      setContestPdfUrls(prev => [...prev, ...urls]);
+      contestPdfUrlsRef.current = [...contestPdfUrlsRef.current, ...urls];
     } catch (err) {
       alert(err.response?.data?.message || 'PDF upload failed');
-      setPdfFile(null);
     } finally {
-      setPdfUploading(false);
+      setContestPdfUploading(false);
+      e.target.value = '';
     }
+  };
+
+  const removeContestPdf = (index) => {
+    setContestPdfFiles(prev => prev.filter((_, i) => i !== index));
+    const updated = contestPdfUrlsRef.current.filter((_, i) => i !== index);
+    contestPdfUrlsRef.current = updated;
+    setContestPdfUrls(updated);
+  };
+
+  const handleLearningPdfSelect = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    setLearningPdfUploading(true);
+    try {
+      const res = await uploadFile(files);
+      const urls = res.data?.urls ?? res.data?.data?.urls ?? [];
+      setLearningPdfFiles(prev => [...prev, ...files]);
+      setLearningPdfUrls(prev => [...prev, ...urls]);
+      learningPdfUrlsRef.current = [...learningPdfUrlsRef.current, ...urls];
+    } catch (err) {
+      alert(err.response?.data?.message || 'PDF upload failed');
+    } finally {
+      setLearningPdfUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const removeLearningPdf = (index) => {
+    setLearningPdfFiles(prev => prev.filter((_, i) => i !== index));
+    const updated = learningPdfUrlsRef.current.filter((_, i) => i !== index);
+    learningPdfUrlsRef.current = updated;
+    setLearningPdfUrls(updated);
+  };
+
+  const handleToolsPdfSelect = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    setToolsPdfUploading(true);
+    try {
+      const res = await uploadFile(files);
+      const urls = res.data?.urls ?? res.data?.data?.urls ?? [];
+      setToolsPdfFiles(prev => [...prev, ...files]);
+      setToolsPdfUrls(prev => [...prev, ...urls]);
+      toolsPdfUrlsRef.current = [...toolsPdfUrlsRef.current, ...urls];
+    } catch (err) {
+      alert(err.response?.data?.message || 'PDF upload failed');
+    } finally {
+      setToolsPdfUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const removeToolsPdf = (index) => {
+    setToolsPdfFiles(prev => prev.filter((_, i) => i !== index));
+    const updated = toolsPdfUrlsRef.current.filter((_, i) => i !== index);
+    toolsPdfUrlsRef.current = updated;
+    setToolsPdfUrls(updated);
+  };
+
+  const resetImages = () => {
+    setUploadedFiles([]); setImageUrls([]); imageUrlsRef.current = [];
   };
 
   const tabs = [
@@ -236,7 +327,7 @@ const Services = () => {
           {/* Image + PDF Upload — side by side */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">Background Image</label>
+              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">Background Images</label>
               <button
                 type="button"
                 onDrop={handleDrop}
@@ -247,47 +338,74 @@ const Services = () => {
                   dragOver ? 'border-[#25c3a3] bg-[#25c3a3]/5' : 'border-[#1e293b] hover:border-gray-600'
                 }`}
               >
-                <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/png,image/jpeg,image/webp" className="hidden" />
+                <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/png,image/jpeg,image/webp" multiple className="hidden" />
                 <FiUploadCloud className="w-7 h-7 text-gray-500 mb-2" />
                 {imageUploading ? (
                   <p className="text-[12px] text-gray-400">Uploading...</p>
-                ) : uploadedFile ? (
-                  <p className="text-[12px] text-[#25c3a3] font-medium px-2 text-center truncate w-full">{uploadedFile.name}</p>
                 ) : (
                   <>
-                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span></p>
-                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PNG / WEBP</p>
+                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span> (multiple)</p>
+                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PNG / JPG / WEBP</p>
                   </>
                 )}
               </button>
+              {uploadedFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {uploadedFiles.map((f, i) => (
+                    <span key={i} className="flex items-center gap-1 bg-[#0a0f1e] border border-[#1e293b] rounded px-2 py-1 text-[11px] text-[#25c3a3]">
+                      {f.name}
+                      <button type="button" onClick={() => removeImage(i)} className="text-gray-500 hover:text-red-400 ml-1">✕</button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">PDF Upload</label>
+              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">PDF Upload (multiple)</label>
               <button
                 type="button"
-                onClick={() => pdfInputRef.current?.click()}
+                onClick={() => contestPdfInputRef.current?.click()}
                 className="w-full py-8 bg-[#0a0f1e] border-2 border-dashed border-[#1e293b] hover:border-gray-600 rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer"
               >
-                <input type="file" ref={pdfInputRef} onChange={handlePdfSelect} accept="application/pdf" className="hidden" />
+                <input type="file" ref={contestPdfInputRef} onChange={handleContestPdfSelect} accept="application/pdf" multiple className="hidden" />
                 <FiUploadCloud className="w-7 h-7 text-gray-500 mb-2" />
-                {pdfUploading ? (
+                {contestPdfUploading ? (
                   <p className="text-[12px] text-gray-400">Uploading...</p>
-                ) : pdfFile ? (
-                  <>
-                    <p className="text-[12px] text-[#25c3a3] font-medium px-2 text-center truncate w-full">{pdfFile.name}</p>
-                    {pdfUrl && <p className="text-[10px] text-gray-500 mt-1">Uploaded ✓</p>}
-                  </>
                 ) : (
                   <>
-                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span></p>
+                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span> (multiple)</p>
                     <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PDF only</p>
                   </>
                 )}
               </button>
+              {contestPdfFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {contestPdfFiles.map((f, i) => (
+                    <span key={i} className="flex items-center gap-1 bg-[#0a0f1e] border border-[#1e293b] rounded px-2 py-1 text-[11px] text-[#25c3a3]">
+                      {f.name}
+                      <button type="button" onClick={() => removeContestPdf(i)} className="text-gray-500 hover:text-red-400 ml-1">✕</button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Start Date & End Date */}
+          {/* Google Meet Link */}
+          <div className="mb-6">
+            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              Google Meet Link
+            </label>
+            <input
+              type="text"
+              value={contestForm.googleMeetLink}
+              onChange={(e) => handleContestChange('googleMeetLink', e.target.value)}
+              className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors"
+              placeholder="e.g. https://meet.google.com/..."
+            />
+          </div>
+
+          {/* Start & End Date */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
               <label htmlFor='Start Date' className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
@@ -331,15 +449,19 @@ const Services = () => {
                   title: contestForm.campaignTitle,
                   subTitle: contestForm.subTitle,
                   description: contestForm.description,
-                  imageUrl: imageUrlRef.current,
+                  imageUrls: imageUrlsRef.current,
                   mediaUrl: contestForm.mediaUrl,
+                  googleMeetLink: contestForm.googleMeetLink,
                   startDate: contestForm.startDate ? new Date(contestForm.startDate).toISOString() : '',
                   endDate: contestForm.endDate ? new Date(contestForm.endDate).toISOString() : '',
-                  ...(pdfUrlRef.current && { pdfUrl: pdfUrlRef.current }),
+                  pdfUrls: contestPdfUrlsRef.current,
                 };
                 try {
                   await createEvent(payload);
                   alert('Campaign deployed successfully!');
+                  setContestForm({ campaignTitle: '', subTitle: '', description: '', mediaUrl: '', googleMeetLink: '', startDate: '', endDate: '' });
+                  resetImages();
+                  setContestPdfFiles([]); setContestPdfUrls([]); contestPdfUrlsRef.current = [];
                 } catch (err) {
                   const msg = err.response?.data?.message || 'Failed to deploy campaign';
                   alert(msg);
@@ -428,7 +550,7 @@ const Services = () => {
           {/* Image + PDF Upload — side by side */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">Background Image</label>
+              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">Background Images</label>
               <button
                 type="button"
                 onDrop={handleDrop}
@@ -439,44 +561,71 @@ const Services = () => {
                   dragOver ? 'border-[#25c3a3] bg-[#25c3a3]/5' : 'border-[#1e293b] hover:border-gray-600'
                 }`}
               >
-                <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/png,image/jpeg,image/webp" className="hidden" />
+                <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/png,image/jpeg,image/webp" multiple className="hidden" />
                 <FiUploadCloud className="w-7 h-7 text-gray-500 mb-2" />
                 {imageUploading ? (
                   <p className="text-[12px] text-gray-400">Uploading...</p>
-                ) : uploadedFile ? (
-                  <p className="text-[12px] text-[#25c3a3] font-medium px-2 text-center truncate w-full">{uploadedFile.name}</p>
                 ) : (
                   <>
-                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span></p>
-                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PNG / WEBP</p>
+                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span> (multiple)</p>
+                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PNG / JPG / WEBP</p>
                   </>
                 )}
               </button>
+              {uploadedFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {uploadedFiles.map((f, i) => (
+                    <span key={i} className="flex items-center gap-1 bg-[#0a0f1e] border border-[#1e293b] rounded px-2 py-1 text-[11px] text-[#25c3a3]">
+                      {f.name}
+                      <button type="button" onClick={() => removeImage(i)} className="text-gray-500 hover:text-red-400 ml-1">✕</button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">PDF Upload</label>
+              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">PDF Upload (multiple)</label>
               <button
                 type="button"
-                onClick={() => pdfInputRef.current?.click()}
+                onClick={() => learningPdfInputRef.current?.click()}
                 className="w-full py-8 bg-[#0a0f1e] border-2 border-dashed border-[#1e293b] hover:border-gray-600 rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer"
               >
-                <input type="file" ref={pdfInputRef} onChange={handlePdfSelect} accept="application/pdf" className="hidden" />
+                <input type="file" ref={learningPdfInputRef} onChange={handleLearningPdfSelect} accept="application/pdf" multiple className="hidden" />
                 <FiUploadCloud className="w-7 h-7 text-gray-500 mb-2" />
-                {pdfUploading ? (
+                {learningPdfUploading ? (
                   <p className="text-[12px] text-gray-400">Uploading...</p>
-                ) : pdfFile ? (
-                  <>
-                    <p className="text-[12px] text-[#25c3a3] font-medium px-2 text-center truncate w-full">{pdfFile.name}</p>
-                    {pdfUrl && <p className="text-[10px] text-gray-500 mt-1">Uploaded ✓</p>}
-                  </>
                 ) : (
                   <>
-                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span></p>
+                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span> (multiple)</p>
                     <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PDF only</p>
                   </>
                 )}
               </button>
+              {learningPdfFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {learningPdfFiles.map((f, i) => (
+                    <span key={i} className="flex items-center gap-1 bg-[#0a0f1e] border border-[#1e293b] rounded px-2 py-1 text-[11px] text-[#25c3a3]">
+                      {f.name}
+                      <button type="button" onClick={() => removeLearningPdf(i)} className="text-gray-500 hover:text-red-400 ml-1">✕</button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
+          </div>
+
+          {/* Google Meet Link */}
+          <div className="mb-6">
+            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              Google Meet Link
+            </label>
+            <input
+              type="text"
+              value={learningForm.googleMeetLink}
+              onChange={(e) => handleLearningChange('googleMeetLink', e.target.value)}
+              className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors"
+              placeholder="e.g. https://meet.google.com/..."
+            />
           </div>
 
           {/* Price & Duration */}
@@ -558,17 +707,21 @@ const Services = () => {
                   packageName: learningForm.packageName,
                   category: learningForm.category,
                   description: learningForm.description,
-                  imageUrl: imageUrlRef.current,
+                  imageUrls: imageUrlsRef.current,
                   mediaUrl: learningForm.mediaUrl,
+                  googleMeetLink: learningForm.googleMeetLink,
                   price: Number(learningForm.price) || 0,
                   duration: learningForm.duration,
                   accessLevel: learningForm.accessLevel,
                   status: learningForm.status,
-                  ...(pdfUrlRef.current && { pdfUrl: pdfUrlRef.current }),
+                  pdfUrls: learningPdfUrlsRef.current,
                 };
                 try {
                   await createEvent(payload);
                   alert('Package published successfully!');
+                  setLearningForm({ packageName: '', category: 'cryptocurrency_basics', description: '', mediaUrl: '', googleMeetLink: '', price: '', duration: '', accessLevel: 'all_members', status: 'active' });
+                  resetImages();
+                  setLearningPdfFiles([]); setLearningPdfUrls([]); learningPdfUrlsRef.current = [];
                 } catch (err) {
                   const msg = err.response?.data?.message || 'Failed to publish package';
                   alert(msg);
@@ -658,7 +811,7 @@ const Services = () => {
           {/* Image + PDF Upload — side by side */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">Background Image</label>
+              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">Background Images</label>
               <button
                 type="button"
                 onDrop={handleDrop}
@@ -669,44 +822,71 @@ const Services = () => {
                   dragOver ? 'border-[#25c3a3] bg-[#25c3a3]/5' : 'border-[#1e293b] hover:border-gray-600'
                 }`}
               >
-                <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/png,image/jpeg,image/webp" className="hidden" />
+                <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/png,image/jpeg,image/webp" multiple className="hidden" />
                 <FiUploadCloud className="w-7 h-7 text-gray-500 mb-2" />
                 {imageUploading ? (
                   <p className="text-[12px] text-gray-400">Uploading...</p>
-                ) : uploadedFile ? (
-                  <p className="text-[12px] text-[#25c3a3] font-medium px-2 text-center truncate w-full">{uploadedFile.name}</p>
                 ) : (
                   <>
-                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span></p>
-                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PNG / WEBP</p>
+                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span> (multiple)</p>
+                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PNG / JPG / WEBP</p>
                   </>
                 )}
               </button>
+              {uploadedFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {uploadedFiles.map((f, i) => (
+                    <span key={i} className="flex items-center gap-1 bg-[#0a0f1e] border border-[#1e293b] rounded px-2 py-1 text-[11px] text-[#25c3a3]">
+                      {f.name}
+                      <button type="button" onClick={() => removeImage(i)} className="text-gray-500 hover:text-red-400 ml-1">✕</button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
-              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">PDF Upload</label>
+              <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">PDF Upload (multiple)</label>
               <button
                 type="button"
-                onClick={() => pdfInputRef.current?.click()}
+                onClick={() => toolsPdfInputRef.current?.click()}
                 className="w-full py-8 bg-[#0a0f1e] border-2 border-dashed border-[#1e293b] hover:border-gray-600 rounded-lg flex flex-col items-center justify-center transition-all cursor-pointer"
               >
-                <input type="file" ref={pdfInputRef} onChange={handlePdfSelect} accept="application/pdf" className="hidden" />
+                <input type="file" ref={toolsPdfInputRef} onChange={handleToolsPdfSelect} accept="application/pdf" multiple className="hidden" />
                 <FiUploadCloud className="w-7 h-7 text-gray-500 mb-2" />
-                {pdfUploading ? (
+                {toolsPdfUploading ? (
                   <p className="text-[12px] text-gray-400">Uploading...</p>
-                ) : pdfFile ? (
-                  <>
-                    <p className="text-[12px] text-[#25c3a3] font-medium px-2 text-center truncate w-full">{pdfFile.name}</p>
-                    {pdfUrl && <p className="text-[10px] text-gray-500 mt-1">Uploaded ✓</p>}
-                  </>
                 ) : (
                   <>
-                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span></p>
+                    <p className="text-[12px] text-gray-400">Drop or <span className="text-[#25c3a3] font-semibold">browse</span> (multiple)</p>
                     <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">PDF only</p>
                   </>
                 )}
               </button>
+              {toolsPdfFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {toolsPdfFiles.map((f, i) => (
+                    <span key={i} className="flex items-center gap-1 bg-[#0a0f1e] border border-[#1e293b] rounded px-2 py-1 text-[11px] text-[#25c3a3]">
+                      {f.name}
+                      <button type="button" onClick={() => removeToolsPdf(i)} className="text-gray-500 hover:text-red-400 ml-1">✕</button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
+          </div>
+
+          {/* Google Meet Link */}
+          <div className="mb-6">
+            <label className="block text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase mb-2.5">
+              Google Meet Link
+            </label>
+            <input
+              type="text"
+              value={toolsForm.googleMeetLink}
+              onChange={(e) => handleToolsChange('googleMeetLink', e.target.value)}
+              className="w-full px-4 py-3.5 bg-[#0a0f1e] border border-[#1e293b] rounded-lg text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-[#25c3a3]/50 transition-colors"
+              placeholder="e.g. https://meet.google.com/..."
+            />
           </div>
 
           {/* Access Level & Status */}
@@ -759,15 +939,19 @@ const Services = () => {
                   toolName: toolsForm.toolName,
                   toolType: toolsForm.toolType,
                   description: toolsForm.description,
-                  imageUrl: imageUrlRef.current,
+                  imageUrls: imageUrlsRef.current,
                   mediaUrl: toolsForm.mediaUrl,
+                  googleMeetLink: toolsForm.googleMeetLink,
                   accessLevel: toolsForm.accessLevel,
                   status: toolsForm.status,
-                  ...(pdfUrlRef.current && { pdfUrl: pdfUrlRef.current }),
+                  pdfUrls: toolsPdfUrlsRef.current,
                 };
                 try {
                   await createEvent(payload);
                   alert('Tool deployed successfully!');
+                  setToolsForm({ toolName: '', toolType: 'analytics', description: '', mediaUrl: '', googleMeetLink: '', accessLevel: 'all_members', status: 'active' });
+                  resetImages();
+                  setToolsPdfFiles([]); setToolsPdfUrls([]); toolsPdfUrlsRef.current = [];
                 } catch (err) {
                   const msg = err.response?.data?.message || 'Failed to deploy tool';
                   alert(msg);

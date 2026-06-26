@@ -5,7 +5,7 @@ import { FiSearch, FiChevronLeft, FiChevronRight, FiEdit2 } from "react-icons/fi
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
-import {userlist, blockUser, unblockUser, changePassword, changeEmail, addUsdt, getUserById } from "../api/membersApi"
+import {userlist, blockUser, unblockUser, changePassword, changeEmail, addUsdt, addFund, getUserById } from "../api/membersApi"
 
 const AllMembers = () => {
   const navigate = useNavigate()
@@ -32,6 +32,11 @@ const AllMembers = () => {
   const [fundMember, setFundMember] = useState(null)
   const [fundAmount, setFundAmount] = useState("")
   const [fundLoading, setFundLoading] = useState(false)
+  const [showAddFundNew, setShowAddFundNew] = useState(false)
+  const [fundNewMember, setFundNewMember] = useState(null)
+  const [fundNewField, setFundNewField] = useState("walletBalance")
+  const [fundNewAmount, setFundNewAmount] = useState("")
+  const [fundNewLoading, setFundNewLoading] = useState(false)
   const [viewLoading, setViewLoading] = useState(false)
   const limit = 10
 
@@ -234,7 +239,8 @@ const AllMembers = () => {
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-center gap-2">
-                      <button onClick={() => { setFundMember(m); setShowAddFund(true); setFundAmount("") }} className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#25c3a3]/15 text-[#25c3a3] hover:bg-[#25c3a3]/25 transition-colors cursor-pointer whitespace-nowrap">ADD FUND</button>
+                      <button onClick={() => { setFundMember(m); setShowAddFund(true); setFundAmount("") }} className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#25c3a3]/15 text-[#25c3a3] hover:bg-[#25c3a3]/25 transition-colors cursor-pointer whitespace-nowrap">ADD USDT</button>
+                      <button onClick={() => { setFundNewMember(m); setShowAddFundNew(true); setFundNewAmount(""); setFundNewField("walletBalance") }} className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#a78bfa]/15 text-[#a78bfa] hover:bg-[#a78bfa]/25 transition-colors cursor-pointer whitespace-nowrap">ADD FUND</button>
                       <button onClick={() => navigate(`/packages/${m._id}`)} className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#3b82f6]/15 text-[#3b82f6] hover:bg-[#3b82f6]/25 transition-colors cursor-pointer whitespace-nowrap">ZERO PIN</button>
                       <button
                         onClick={async () => {
@@ -585,6 +591,67 @@ const AllMembers = () => {
                 }}
                 className="px-8 py-3 rounded-xl bg-linear-to-r from-[#25c3a3] to-[#1da88a] text-[13px] font-bold text-white hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
               >{fundLoading ? "Processing..." : "Add Fund"}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Fund (New) Modal */}
+      {showAddFundNew && fundNewMember && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="w-full max-w-100 rounded-2xl bg-[#111827] border border-[#2d3a4f] p-6 relative">
+            <div className="flex items-start justify-between mb-1">
+              <h2 className="text-[18px] font-bold text-white">Add Fund</h2>
+              <button onClick={() => setShowAddFundNew(false)} className="text-[#94a3b8] hover:text-white transition-colors cursor-pointer">
+                <IoCloseOutline className="text-xl" />
+              </button>
+            </div>
+            <p className="text-[12px] text-[#94a3b8] mb-6">Adding fund to Member: <span className="text-[#a78bfa] font-semibold">{fundNewMember.userId}</span></p>
+
+            <div className="mb-4">
+              <label className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wide mb-2 block">Field</label>
+              <select
+                value={fundNewField}
+                onChange={(e) => setFundNewField(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white outline-none focus:border-[#a78bfa] transition-colors cursor-pointer"
+              >
+                {["walletBalance", "totalMultiLevelEarned", "totalPoolFundEarned", "totalEarnings", "totalRoiEarned"].map((f) => (
+                  <option key={f} value={f} className="bg-[#0d1321]">{f}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mb-6">
+              <label className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wide mb-2 block">Amount ($)</label>
+              <input
+                type="number"
+                placeholder="Enter amount"
+                value={fundNewAmount}
+                onChange={(e) => setFundNewAmount(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white placeholder-[#475569] outline-none focus:border-[#a78bfa] transition-colors"
+              />
+            </div>
+
+            <div className="flex items-center justify-center gap-4 pt-2">
+              <button onClick={() => setShowAddFundNew(false)} className="text-[13px] text-[#94a3b8] hover:text-white transition-colors cursor-pointer">Cancel</button>
+              <button
+                disabled={fundNewLoading || !fundNewAmount || Number(fundNewAmount) <= 0}
+                onClick={async () => {
+                  setFundNewLoading(true)
+                  try {
+                    await addFund(fundNewMember._id, fundNewField, Number(fundNewAmount))
+                    alert("Fund added successfully")
+                    setShowAddFundNew(false)
+                    setFundNewAmount("")
+                    fetchMembers()
+                  } catch (err) {
+                    alert(err.response?.data?.message || "Failed to add fund")
+                  } finally {
+                    setFundNewLoading(false)
+                  }
+                }}
+                className="px-8 py-3 rounded-xl bg-linear-to-r from-[#a78bfa] to-[#7c3aed] text-[13px] font-bold text-white hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+              >{fundNewLoading ? "Processing..." : "Add Fund"}</button>
             </div>
           </div>
         </div>

@@ -28,6 +28,10 @@ export const addUsdt = async (id, amount) => {
   return axiosInstance.post(`/api/admin/users/${id}/add-usdt`, { amount });
 };
 
+export const addFund = async (id, field, amount) => {
+  return axiosInstance.post(`/api/admin/users/${id}/add-fund`, { field, amount });
+};
+
 export const getUserById = async (id) => {
   return axiosInstance.get(`/api/admin/users/${id}`);
 };
