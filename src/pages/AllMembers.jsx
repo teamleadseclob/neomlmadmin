@@ -5,7 +5,7 @@ import { FiSearch, FiChevronLeft, FiChevronRight, FiEdit2 } from "react-icons/fi
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
-import {userlist, blockUser, unblockUser, changePassword, changeEmail, addUsdt, addFund, getUserById } from "../api/membersApi"
+import {userlist, blockUser, unblockUser, changePassword, changeEmail, addUsdt, addFund, getUserById, updateEarningCap } from "../api/membersApi"
 
 const AllMembers = () => {
   const navigate = useNavigate()
@@ -38,6 +38,11 @@ const AllMembers = () => {
   const [fundNewAmount, setFundNewAmount] = useState("")
   const [fundNewLoading, setFundNewLoading] = useState(false)
   const [viewLoading, setViewLoading] = useState(false)
+  const [showCapLimit, setShowCapLimit] = useState(false)
+  const [capMember, setCapMember] = useState(null)
+  const [roiCap, setRoiCap] = useState("")
+  const [mlrCap, setMlrCap] = useState("")
+  const [capLoading, setCapLoading] = useState(false)
   const limit = 10
 
   const handleStatusChange = async (memberId, newStatus) => {
@@ -241,6 +246,7 @@ const AllMembers = () => {
                     <div className="flex items-center justify-center gap-2">
                       <button onClick={() => { setFundMember(m); setShowAddFund(true); setFundAmount("") }} className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#25c3a3]/15 text-[#25c3a3] hover:bg-[#25c3a3]/25 transition-colors cursor-pointer whitespace-nowrap">ADD USDT</button>
                       <button onClick={() => { setFundNewMember(m); setShowAddFundNew(true); setFundNewAmount(""); setFundNewField("walletBalance") }} className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#a78bfa]/15 text-[#a78bfa] hover:bg-[#a78bfa]/25 transition-colors cursor-pointer whitespace-nowrap">ADD FUND</button>
+                      <button onClick={() => { setCapMember(m); setRoiCap(""); setMlrCap(""); setShowCapLimit(true) }} className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#f59e0b]/15 text-[#f59e0b] hover:bg-[#f59e0b]/25 transition-colors cursor-pointer whitespace-nowrap">CAP LIMIT</button>
                       <button onClick={() => navigate(`/packages/${m._id}`)} className="px-3 py-1.5 text-[10px] font-bold tracking-wider rounded bg-[#3b82f6]/15 text-[#3b82f6] hover:bg-[#3b82f6]/25 transition-colors cursor-pointer whitespace-nowrap">ZERO PIN</button>
                       <button
                         onClick={async () => {
@@ -596,6 +602,65 @@ const AllMembers = () => {
         </div>
       )}
 
+      {/* Cap Limit Modal */}
+      {showCapLimit && capMember && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="w-full max-w-100 rounded-2xl bg-[#111827] border border-[#2d3a4f] p-6 relative">
+            <div className="flex items-start justify-between mb-1">
+              <h2 className="text-[18px] font-bold text-white">Cap Limit</h2>
+              <button onClick={() => setShowCapLimit(false)} className="text-[#94a3b8] hover:text-white transition-colors cursor-pointer">
+                <IoCloseOutline className="text-xl" />
+              </button>
+            </div>
+            <p className="text-[12px] text-[#94a3b8] mb-6">Setting earning cap for Member: <span className="text-[#f59e0b] font-semibold">{capMember.userId}</span></p>
+
+            <div className="mb-4">
+              <label className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wide mb-2 block">ROI Cap ($)</label>
+              <input
+                type="number"
+                placeholder="Enter ROI cap amount"
+                value={roiCap}
+                onChange={(e) => setRoiCap(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white placeholder-[#475569] outline-none focus:border-[#f59e0b] transition-colors"
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wide mb-2 block">MLR Cap ($)</label>
+              <input
+                type="number"
+                placeholder="Enter MLR cap amount"
+                value={mlrCap}
+                onChange={(e) => setMlrCap(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white placeholder-[#475569] outline-none focus:border-[#f59e0b] transition-colors"
+              />
+            </div>
+
+            <div className="flex items-center justify-center gap-4 pt-2">
+              <button onClick={() => setShowCapLimit(false)} className="text-[13px] text-[#94a3b8] hover:text-white transition-colors cursor-pointer">Cancel</button>
+              <button
+                disabled={capLoading || (!roiCap && !mlrCap)}
+                onClick={async () => {
+                  setCapLoading(true)
+                  try {
+                    await updateEarningCap(capMember._id, Number(roiCap), Number(mlrCap))
+                    alert("Cap limit updated successfully")
+                    setShowCapLimit(false)
+                    setRoiCap("")
+                    setMlrCap("")
+                  } catch (err) {
+                    alert(err.response?.data?.message || "Failed to update cap limit")
+                  } finally {
+                    setCapLoading(false)
+                  }
+                }}
+                className="px-8 py-3 rounded-xl bg-linear-to-r from-[#f59e0b] to-[#d97706] text-[13px] font-bold text-white hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+              >{capLoading ? "Updating..." : "Update Cap"}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add Fund (New) Modal */}
       {showAddFundNew && fundNewMember && (
         <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
@@ -615,8 +680,8 @@ const AllMembers = () => {
                 onChange={(e) => setFundNewField(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg bg-[#0d1321] border border-[#2d3a4f] text-[13px] text-white outline-none focus:border-[#a78bfa] transition-colors cursor-pointer"
               >
-                {["walletBalance", "totalMultiLevelEarned", "totalPoolFundEarned", "totalEarnings", "totalRoiEarned"].map((f) => (
-                  <option key={f} value={f} className="bg-[#0d1321]">{f}</option>
+                {["walletBalance", "totalMultiLevelEarned", "totalPoolFundEarned", "totalEarnings", "totalRoiEarned", "totalRewardWalletEarned"].map((f) => (
+                  <option key={f} value={f} className="bg-[#0d1321]">{{walletBalance:"Main Wallet",totalMultiLevelEarned:"Multi level Reward",totalPoolFundEarned:"Pool Fund",totalEarnings:"Total Income",totalRoiEarned:"Trading Profit",totalRewardWalletEarned:"Reward Wallet"}[f] ?? f}</option>
                 ))}
               </select>
             </div>

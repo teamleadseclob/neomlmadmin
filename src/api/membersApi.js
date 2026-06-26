@@ -35,3 +35,7 @@ export const addFund = async (id, field, amount) => {
 export const getUserById = async (id) => {
   return axiosInstance.get(`/api/admin/users/${id}`);
 };
+
+export const updateEarningCap = async (id, roiCap, mlrCap) => {
+  return axiosInstance.patch(`/api/admin/users/${id}/earning-cap`, { roiCap, mlrCap });
+};
