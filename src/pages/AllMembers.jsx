@@ -643,7 +643,7 @@ const AllMembers = () => {
                 onClick={async () => {
                   setCapLoading(true)
                   try {
-                    await updateEarningCap(capMember._id, Number(roiCap), Number(mlrCap))
+                    await updateEarningCap(capMember._id, roiCap ? Number(roiCap) : undefined, mlrCap ? Number(mlrCap) : undefined)
                     alert("Cap limit updated successfully")
                     setShowCapLimit(false)
                     setRoiCap("")

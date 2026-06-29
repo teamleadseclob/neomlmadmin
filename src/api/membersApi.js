@@ -36,6 +36,9 @@ export const getUserById = async (id) => {
   return axiosInstance.get(`/api/admin/users/${id}`);
 };
 
-export const updateEarningCap = async (id, roiCap, mlrCap) => {
-  return axiosInstance.patch(`/api/admin/users/${id}/earning-cap`, { roiCap, mlrCap });
+export const updateEarningCap = async (id, roiEarned, mlrEarned) => {
+  const payload = {};
+  if (roiEarned !== undefined && roiEarned !== "") payload.roiEarned = roiEarned;
+  if (mlrEarned !== undefined && mlrEarned !== "") payload.mlrEarned = mlrEarned;
+  return axiosInstance.patch(`/api/admin/users/${id}/earning-cap`, payload);
 };
