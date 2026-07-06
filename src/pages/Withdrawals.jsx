@@ -15,7 +15,6 @@ const Withdrawals = () => {
   const [withdrawalData, setWithdrawalData] = useState([]);
   const [pagination, setPagination] = useState({ totalDocs: 0, totalPages: 1 });
   const [loading, setLoading] = useState(false);
-  const [selectedIds, setSelectedIds] = useState([]);
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
 
@@ -64,23 +63,10 @@ const Withdrawals = () => {
 
   const pendingIds = withdrawalData.filter(r => r.status === 'pending').map(r => r._id);
 
-  const toggleSelect = (id) => {
-    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-  };
-
-  const toggleSelectAll = () => {
-    if (pendingIds.every(id => selectedIds.includes(id))) {
-      setSelectedIds(prev => prev.filter(id => !pendingIds.includes(id)));
-    } else {
-      setSelectedIds(prev => [...new Set([...prev, ...pendingIds])]);
-    }
-  };
-
   const handleBulkApprove = async () => {
     setBulkLoading(true);
     try {
-      await bulkApproveWithdrawals(selectedIds);
-      setSelectedIds([]);
+      await bulkApproveWithdrawals(pendingIds);
       setShowBulkModal(false);
       fetchWithdrawals(currentPage);
     } catch (err) {
@@ -259,24 +245,16 @@ const Withdrawals = () => {
       <div className="flex items-center gap-3">
         <button
           onClick={() => setShowBulkModal(true)}
-          disabled={selectedIds.length === 0}
+          disabled={pendingIds.length === 0}
           className={`flex items-center gap-2 px-5 py-3 rounded-xl text-[13px] font-bold transition-colors cursor-pointer ${
-            selectedIds.length > 0
+            pendingIds.length > 0
               ? 'bg-[#00e396] hover:bg-[#00c983] text-[#0a0f1e] shadow-[0_0_16px_rgba(0,227,150,0.2)]'
               : 'bg-[#1e293b] text-gray-500 cursor-not-allowed'
           }`}
         >
           <FiCheck className="w-4 h-4" />
-          Bulk Approve {selectedIds.length > 0 && `(${selectedIds.length})`}
+          Bulk Approve ({pendingIds.length})
         </button>
-        {selectedIds.length > 0 && (
-          <button
-            onClick={() => setSelectedIds([])}
-            className="px-4 py-3 bg-[#0f1522] border border-[#1e293b] rounded-xl text-[13px] font-semibold text-gray-300 hover:bg-[#151c2b] transition-colors cursor-pointer"
-          >
-            Clear Selection
-          </button>
-        )}
       </div>
 
       {/* Table */}
@@ -285,16 +263,7 @@ const Withdrawals = () => {
           <table className="w-full min-w-205">
             <thead>
               <tr className="border-b border-[#2d3a4f] bg-[#0a0f1e]/60">
-                <th className="text-left px-4 py-5 w-10">
-                  {pendingIds.length > 0 && (
-                    <input
-                      type="checkbox"
-                      checked={pendingIds.length > 0 && pendingIds.every(id => selectedIds.includes(id))}
-                      onChange={toggleSelectAll}
-                      className="w-4 h-4 rounded border-gray-600 bg-[#0a0f1e] accent-[#00e396] cursor-pointer"
-                    />
-                  )}
-                </th>
+
                 <th className="text-left px-6 py-5 text-[10px] font-bold tracking-[0.12em] text-gray-400 uppercase w-15">S. No</th>
                 <th className="text-left px-4 py-5 text-[10px] font-bold tracking-[0.12em] text-gray-400 uppercase">User Identity</th>
                 <th className="text-left px-4 py-5 text-[10px] font-bold tracking-[0.12em] text-gray-400 uppercase">Amount (USDT)</th>
@@ -306,10 +275,10 @@ const Withdrawals = () => {
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan="8" className="text-center py-10 text-gray-400">Loading...</td></tr>
+                <tr><td colSpan="7" className="text-center py-10 text-gray-400">Loading...</td></tr>
               )}
               {!loading && withdrawalData.length === 0 && (
-                <tr><td colSpan="8" className="text-center py-10 text-gray-400">No withdrawals found</td></tr>
+                <tr><td colSpan="7" className="text-center py-10 text-gray-400">No withdrawals found</td></tr>
               )}
               {!loading && withdrawalData.length > 0 &&
                 withdrawalData.map((row, idx) => (
@@ -317,16 +286,7 @@ const Withdrawals = () => {
                     key={row._id}
                     className="border-b border-[#2d3a4f]/60 hover:bg-[#1a2435] transition-colors group"
                   >
-                    <td className="px-4 py-5">
-                      {row.status === 'pending' && (
-                        <input
-                          type="checkbox"
-                          checked={selectedIds.includes(row._id)}
-                          onChange={() => toggleSelect(row._id)}
-                          className="w-4 h-4 rounded border-gray-600 bg-[#0a0f1e] accent-[#00e396] cursor-pointer"
-                        />
-                      )}
-                    </td>
+
                     <td className="px-6 py-5 text-[13px] font-semibold text-gray-300">
                       {String((currentPage - 1) * 10 + idx + 1).padStart(2, '0')}
                     </td>
@@ -451,7 +411,7 @@ const Withdrawals = () => {
             </div>
             <h3 className="text-[18px] font-bold text-white text-center mb-2">Confirm Bulk Approve</h3>
             <p className="text-[13px] text-gray-400 text-center mb-6">
-              You are about to approve <span className="text-white font-bold">{selectedIds.length}</span> pending withdrawal{selectedIds.length > 1 ? 's' : ''}. This action cannot be undone.
+              You are about to approve <span className="text-white font-bold">{pendingIds.length}</span> pending withdrawal{pendingIds.length > 1 ? 's' : ''}. This action cannot be undone.
             </p>
             <div className="flex items-center gap-3">
               <button
