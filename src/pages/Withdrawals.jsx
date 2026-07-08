@@ -242,7 +242,7 @@ const Withdrawals = () => {
       </div>
 
       {/* Bulk Approve Button */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <button
           onClick={() => setShowBulkModal(true)}
           disabled={pendingIds.length === 0}
@@ -255,6 +255,11 @@ const Withdrawals = () => {
           <FiCheck className="w-4 h-4" />
           Bulk Approve ({pendingIds.length})
         </button>
+        <div className="flex-1" />
+        <div className="flex items-center gap-2 px-4 py-3 bg-[#0f1522] border border-[#1e293b] rounded-xl">
+          <span className="text-[11px] font-bold tracking-[0.1em] text-gray-400 uppercase">Pending Amount</span>
+          <span className="text-[14px] font-extrabold text-yellow-400">${(summary.totalAmountPending || 0).toLocaleString()}</span>
+        </div>
       </div>
 
       {/* Table */}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { IoSettingsOutline, IoNotificationsOutline } from "react-icons/io5"
 import { FiUploadCloud, FiTrash2 } from "react-icons/fi"
-import { getNotifications, uploadNotification, deleteNotification, toggleNotification } from "../api/notificationApi"
+import { getNotifications, uploadNotification, deleteNotification, toggleNotification, getBanners, createBanner, deleteBanner } from "../api/notificationApi"
 
 const PushNotifications = () => {
   const [enabled, setEnabled] = useState(true)
@@ -87,6 +87,59 @@ const PushNotifications = () => {
 
   const rawUrl = notification?.image || notification?.imageUrl || null
   const imageUrl = rawUrl?.startsWith("http") ? rawUrl : rawUrl ? `http://192.168.29.36:5001${rawUrl}` : null
+
+  // ── Banner state ──────────────────────────────────────────────
+  const [banners, setBanners] = useState([])
+  const [activeBanner, setActiveBanner] = useState(null)
+  const [bannerFile, setBannerFile] = useState(null)
+  const [bannerPreview, setBannerPreview] = useState(null)
+  const [bannerLoading, setBannerLoading] = useState(false)
+  const [editFile, setEditFile] = useState(null)
+  const [editPreview, setEditPreview] = useState(null)
+
+  const resolveUrl = (url) =>
+    !url ? null : url.startsWith("http") ? url : `http://192.168.29.36:5001${url}`
+
+  const fetchBanners = async () => {
+    try {
+      const res = await getBanners()
+      const list = res.data?.data || res.data || []
+      setBanners(list)
+      setActiveBanner(list[0] || null)
+    } catch (err) {
+      console.error("Failed to fetch banners", err)
+    }
+  }
+
+  useEffect(() => { fetchBanners() }, [])
+
+  const handleBannerFileSelect = (e) => {
+    const f = e.target.files[0]
+    if (f) { setBannerFile(f); setBannerPreview(URL.createObjectURL(f)) }
+    e.target.value = ""
+  }
+
+  const handleBannerUpload = async () => {
+    if (!bannerFile) return
+    setBannerLoading(true)
+    try {
+      const fd = new FormData()
+      fd.append("imageUrl", bannerFile)
+      await createBanner(fd)
+      setBannerFile(null); setBannerPreview(null)
+      await fetchBanners()
+    } catch (err) { console.error("Banner upload failed", err) }
+    finally { setBannerLoading(false) }
+  }
+
+  const handleBannerDelete = async (id) => {
+    try {
+      await deleteBanner(id)
+      setActiveBanner(null)
+      await fetchBanners()
+    }
+    catch (err) { console.error("Banner delete failed", err) }
+  }
 
   return (
     <div className="p-6 w-full min-h-screen">
@@ -182,6 +235,75 @@ const PushNotifications = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Landing Page Banner Section */}
+      <div className="mt-8">
+        <div className="mb-4">
+          <h2 className="text-[18px] font-bold text-white">Landing Page Banner</h2>
+          <p className="text-[11px] text-gray-400 mt-0.5">Upload and manage banners displayed on the landing page.</p>
+        </div>
+
+        {/* Upload new banner */}
+        <div className="flex gap-5 mb-5">
+          <div className="flex-1 bg-[#0f1522] border border-[#2d3a4f] rounded-[14px] p-6">
+            <label className="text-[11px] font-bold text-[#25c3a3] tracking-wide mb-3 block">Add New Banner</label>
+            {activeBanner && !bannerPreview ? (
+              <div className="relative rounded-lg overflow-hidden border border-[#2d3a4f]">
+                <img src={resolveUrl(activeBanner.imageUrl || activeBanner.image)} alt="banner" crossOrigin="anonymous" className="w-full h-70 object-cover" />
+                <button
+                  onClick={() => handleBannerDelete(activeBanner._id)}
+                  disabled={bannerLoading}
+                  className="absolute top-3 right-3 px-3 py-1.5 rounded-lg bg-red-500/90 flex items-center gap-1.5 text-white text-[11px] font-semibold cursor-pointer hover:bg-red-600 transition-colors disabled:opacity-50"
+                >
+                  <FiTrash2 className="w-3.5 h-3.5" />
+                  Delete
+                </button>
+              </div>
+            ) : bannerPreview ? (
+              <>
+                <div className="relative rounded-lg overflow-hidden border border-[#2d3a4f]">
+                  <img src={bannerPreview} alt="preview" className="w-full h-70 object-cover" />
+                </div>
+                <div className="flex items-center justify-end gap-4 mt-6">
+                  <button
+                    onClick={handleBannerUpload}
+                    disabled={bannerLoading}
+                    className="px-10 py-3 rounded-lg text-[13px] font-bold bg-[#25c3a3] text-[#0a0f1e] hover:bg-[#25c3a3]/80 transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {bannerLoading ? "Uploading..." : "Upload"}
+                  </button>
+                  <button
+                    onClick={() => { setBannerFile(null); setBannerPreview(null) }}
+                    className="px-10 py-3 rounded-lg text-[13px] font-bold border border-[#2d3a4f] text-gray-300 hover:border-gray-500 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            ) : (
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#2d3a4f] rounded-lg py-28 cursor-pointer hover:border-[#25c3a3]/40 transition-colors">
+                <FiUploadCloud className="w-8 h-8 text-gray-500 mb-2" />
+                <span className="text-[12px] font-semibold text-gray-400">Upload Landing Page Banner</span>
+                <span className="text-[10px] text-gray-500 mt-1">Recommended: 1200x400px</span>
+                <input type="file" accept="image/*" onChange={handleBannerFileSelect} className="hidden" />
+              </label>
+            )}
+          </div>
+
+          {/* Right panel */}
+          <div className="w-87.5 flex flex-col gap-4">
+            <div className="bg-[#0f1522] border border-[#2d3a4f] rounded-[14px] p-4">
+              <div className="flex items-start gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#25c3a3] mt-1 shrink-0" />
+                <p className="text-[10px] text-gray-400 leading-relaxed">
+                  Banner images are displayed on the landing page. Upload high-quality images for best results.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   )

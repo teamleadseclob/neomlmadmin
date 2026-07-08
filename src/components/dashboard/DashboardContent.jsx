@@ -11,15 +11,24 @@ import { GiTwoCoins } from "react-icons/gi"
 import { getDashboardDataApi } from "../../api/dashboardApi"
 
 // eslint-disable-next-line react/prop-types
-const StatCard = ({ icon, label, value, todayLabel = "TODAY", todayValue }) => (
+const StatCard = ({ icon, label, value, todayLabel = "TODAY", todayValue, todayCredit, todayDebit }) => (
   <div className="rounded-2xl border border-[#737c7a]/50 bg-[#0a1018] p-6 sm:p-7 flex flex-col justify-between min-h-40 sm:min-h-43.75 shadow-[0_0_10px_rgba(109,119,116,0.15)] transition-all duration-300 hover:bg-linear-to-br hover:from-[#0f2a1f] hover:to-[#0a1a14] hover:border-[#14CA74]/60 cursor-pointer">
     <div className="flex items-start justify-between">
       <div className="w-14 h-14 rounded-xl bg-[#0f1a24] border border-[#1a2a3a] flex items-center justify-center text-[#14CA74] text-2xl">
         {icon}
       </div>
       <div className="text-right">
-        <p className="text-[10px] font-bold tracking-[0.15em]  uppercase">{todayLabel}</p>
-        <p className="text-[18px] sm:text-[20px] font-bold text-[#14CA74] mt-1">{todayValue}</p>
+        {todayCredit !== undefined ? (
+          <>
+            <p className="text-[10px] font-bold tracking-[0.15em] uppercase">TODAY</p>
+            <p className="text-[18px] sm:text-[20px] font-bold text-[#14CA74] mt-1">{todayCredit}</p>
+          </>
+        ) : (
+          <>
+            <p className="text-[10px] font-bold tracking-[0.15em] uppercase">{todayLabel}</p>
+            <p className="text-[18px] sm:text-[20px] font-bold text-[#14CA74] mt-1">{todayValue}</p>
+          </>
+        )}
       </div>
     </div>
     <div className="mt-5">
@@ -38,11 +47,11 @@ const cardConfig = [
   { key: "totalRoiDistributed", icon: <RiMoneyDollarCircleLine />, label: "Total ROI Distributed", prefix: "$", hasToday: true },
   { key: "totalMultiLevelReward", icon: <TbArrowsExchange />, label: "Total Multi Level Reward", prefix: "$", hasToday: true },
   { key: "totalRankIncome", icon: <FiAward />, label: "Total Rank Income", prefix: "$", hasToday: true },
-  { key: "totalPendingWithdrawal", icon: <MdOutlinePendingActions />, label: "Total Pending Withdrawal", prefix: "$" },
-  { key: "totalPaidWithdrawal", icon: <MdOutlinePaid />, label: "Total Paid Withdrawal", prefix: "$" },
-  { key: "poolFund", icon: <GiTwoCoins />, label: "Pool Fund", prefix: "$" },
-  { key: "managementFund", icon: <IoWalletOutline />, label: "Management Fund", prefix: "$" },
-  { key: "operationWalletFund", icon: <IoSettingsOutline />, label: "Operation Wallet Fund", prefix: "$" },
+  { key: "totalPendingWithdrawal", icon: <MdOutlinePendingActions />, label: "Total Pending Withdrawal", prefix: "$", hasToday: true },
+  { key: "totalPaidWithdrawal", icon: <MdOutlinePaid />, label: "Total Paid Withdrawal", prefix: "$", hasToday: true },
+  { key: "poolFund", icon: <GiTwoCoins />, label: "Pool Fund", prefix: "$", hasCrDr: true },
+  { key: "managementFund", icon: <IoWalletOutline />, label: "Management Fund", prefix: "$", hasCrDr: true },
+  { key: "operationWalletFund", icon: <IoSettingsOutline />, label: "Operation Wallet Fund", prefix: "$", hasCrDr: true },
 ]
 
 const fmt = (val, prefix = "") => `${prefix}${Number(val).toLocaleString()}`
@@ -71,15 +80,18 @@ const DashboardContent = () => {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-4 sm:mb-5">
-        {cardConfig.map(({ key, icon, label, prefix, hasToday }) => {
-          const rawValue = hasToday ? data?.[key]?.total : data?.[key]
+        {cardConfig.map(({ key, icon, label, prefix, hasToday, hasCrDr }) => {
+          const raw = data?.[key]
+          const total = (hasToday || hasCrDr) ? raw?.total : raw
           return (
             <StatCard
               key={key}
               icon={icon}
               label={label}
-              value={data ? fmt(rawValue, prefix) : "--"}
-              todayValue={data && hasToday ? fmt(data[key]?.today, prefix) : "--"}
+              value={data ? fmt(total, prefix) : "--"}
+              todayValue={data && hasToday ? fmt(raw?.today, prefix) : "--"}
+              todayCredit={data && hasCrDr ? fmt(raw?.todayCredit, prefix) : undefined}
+              todayDebit={data && hasCrDr ? fmt(raw?.todayDebit, prefix) : undefined}
             />
           )
         })}
