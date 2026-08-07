@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const axiosInstance = axios.create({
-  // baseURL: "http://192.168.29.36:5001",
+  // baseURL: "http://localhost:5001",
   baseURL: "https://backend.neofiacademy.com",
   headers: { "Content-Type": "application/json" },
 })
@@ -15,7 +15,9 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const isLoginRoute = error.config?.url?.includes("/auth/login")
+    const isChangePasswordRoute = error.config?.url?.includes("/change-password")
+    if (error.response?.status === 401 && !isLoginRoute && !isChangePasswordRoute) {
       localStorage.clear()
       globalThis.location.href = "/login"
     }

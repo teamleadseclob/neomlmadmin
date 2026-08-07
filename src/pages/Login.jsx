@@ -21,22 +21,31 @@ const Login = () => {
     setLoading(true)
 
     try {
+      console.log("[LOGIN] Request →", { userId, password })
       const { data } = await loginApi(userId, password)
+      console.log("[LOGIN] Response →", data)
 
-      const role = data?.data?.role || data?.role || data?.user?.role
-      if (role === "user") {
+      const role = data?.data?.user?.role
+      console.log("[LOGIN] Role →", role)
+      if (role !== "admin") {
         setError("Access denied. Only admins can login.")
         setLoading(false)
         return
       }
 
-      const token = data?.data?.token || data?.token
-      if (token) localStorage.setItem("token", token)
+      const token = data?.data?.token
+      if (!token) {
+        setError("Login failed. No token received.")
+        setLoading(false)
+        return
+      }
+      localStorage.setItem("token", token)
       localStorage.setItem("isLoggedIn", "true")
-      localStorage.setItem("user", JSON.stringify(data?.data || data?.user || data))
+      localStorage.setItem("user", JSON.stringify(data?.data?.user))
 
       navigate("/")
     } catch (err) {
+      console.log("[LOGIN] Error →", err.response?.data || err.message)
       setError(err.response?.data?.message || "Login failed. Please try again.")
     } finally {
       setLoading(false)
