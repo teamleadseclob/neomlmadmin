@@ -1,13 +1,60 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {IoSearchOutline } from "react-icons/io5"
 import { HiOutlineUser } from "react-icons/hi"
+import { getAdminProfileApi, updateAdminProfileApi } from "../../api/authApi"
 
 const AdminProfile = () => {
   const [profile, setProfile] = useState({
-    fullName: "Alexander Thorne",
-    adminRole: "Super Admin",
-    email: "alexander.t@financeflow.ledger",
+    fullName: "",
+    adminRole: "",
+    email: "",
   })
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState("")
+
+  const [originalName, setOriginalName] = useState("")
+
+  useEffect(() => {
+    getAdminProfileApi()
+      .then(({ data }) => {
+        const d = data.data ?? data
+        const name = d.fullName ?? d.name ?? ""
+        setProfile({
+          fullName: name,
+          adminRole: d.adminRole ?? d.role ?? "",
+          email: d.email ?? "",
+        })
+        setOriginalName(name)
+      })
+      .catch(console.error)
+  }, [])
+
+  const handleEdit = () => {
+    setOriginalName(profile.fullName)
+    setEditing(true)
+  }
+
+  const handleDiscard = () => {
+    setProfile((p) => ({ ...p, fullName: originalName }))
+    setEditing(false)
+    setMsg("")
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    setMsg("")
+    try {
+      await updateAdminProfileApi(profile.fullName)
+      setMsg("Saved!")
+      setEditing(false)
+    } catch {
+      setMsg("Failed to save.")
+    } finally {
+      setSaving(false)
+      setTimeout(() => setMsg(""), 3000)
+    }
+  }
 
   return (
     <div>
@@ -21,12 +68,31 @@ const AdminProfile = () => {
             className="bg-transparent text-[13px] text-[#94a3b8] placeholder-[#475569] outline-none w-full"
           />
         </div>
-        <button className="px-5 py-2.5 rounded-lg border border-[#1e293b] text-[13px] text-white hover:bg-[#111827] transition-colors cursor-pointer">
-          Discord
-        </button>
-        <button className="px-5 py-2.5 rounded-lg bg-[#25c3a3] text-[13px] text-white font-medium hover:bg-[#1fa88c] transition-colors cursor-pointer">
-          Save Changes
-        </button>
+        {msg && <span className={`text-[12px] ${msg === "Saved!" ? "text-[#25c3a3]" : "text-red-400"}`}>{msg}</span>}
+        {!editing ? (
+          <button
+            onClick={handleEdit}
+            className="px-5 py-2.5 rounded-lg bg-[#25c3a3] text-[13px] text-white font-medium hover:bg-[#1fa88c] transition-colors cursor-pointer"
+          >
+            Edit Profile
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={handleDiscard}
+              className="px-5 py-2.5 rounded-lg border border-[#1e293b] text-[13px] text-white hover:bg-[#111827] transition-colors cursor-pointer"
+            >
+              Discard
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-5 py-2.5 rounded-lg bg-[#25c3a3] text-[13px] text-white font-medium hover:bg-[#1fa88c] transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {saving ? "Saving..." : "Save Changes"}
+            </button>
+          </>
+        )}
       </div>
 
       {/* Administrative Profile Card */}
@@ -56,7 +122,8 @@ const AdminProfile = () => {
                   type="text"
                   value={profile.fullName}
                   onChange={(e) => setProfile({ ...profile, fullName: e.target.value })}
-                  className="w-full bg-[#111827] border border-[#1e293b] rounded-lg px-4 py-3 text-[13px] text-white outline-none focus:border-[#25c3a3]/50 transition-colors"
+                  readOnly={!editing}
+                  className={`w-full bg-[#111827] border border-[#1e293b] rounded-lg px-4 py-3 text-[13px] text-white outline-none transition-colors ${editing ? "focus:border-[#25c3a3]/50" : "opacity-70 cursor-not-allowed"}`}
                 />
               </div>
               <div>

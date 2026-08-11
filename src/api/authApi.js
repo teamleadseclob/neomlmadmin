@@ -6,3 +6,9 @@ export const loginApi = (userId, password) =>
 
 export const changePasswordApi = (currentPassword, newPassword, confirmNewPassword) =>
   axiosInstance.patch("/api/admin/change-password", { currentPassword, newPassword, confirmNewPassword })
+
+export const getAdminProfileApi = () =>
+  axiosInstance.get("/api/admin/profile")
+
+export const updateAdminProfileApi = (fullName) =>
+  axiosInstance.put("/api/admin/profile", { name: fullName })

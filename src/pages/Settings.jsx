@@ -1,7 +1,7 @@
 import { IoSettingsOutline, IoNotificationsOutline } from "react-icons/io5"
 import AdminProfile from "../components/settings/AdminProfile"
 import SecurityCredentials from "../components/settings/SecurityCredentials"
-import WebsitePromotions from "../components/settings/WebsitePromotions"
+// import WebsitePromotions from "../components/settings/WebsitePromotions"
 
 const Settings = () => (
   <div>
@@ -26,7 +26,7 @@ const Settings = () => (
     <div className="space-y-6">
       <AdminProfile />
       <SecurityCredentials />
-      <WebsitePromotions />
+      {/* <WebsitePromotions /> */}
     </div>
   </div>
 )
