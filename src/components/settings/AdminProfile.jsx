@@ -108,9 +108,7 @@ const AdminProfile = () => {
             <div className="w-20 h-20 rounded-full bg-[#1a2332] border-2 border-[#1e293b] flex items-center justify-center overflow-hidden">
               <HiOutlineUser className="text-3xl text-[#475569]" />
             </div>
-            <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-[#25c3a3] border-2 border-[#0d1321] flex items-center justify-center">
-              <span className="text-white text-[10px]">✓</span>
-            </div>
+
           </div>
 
           {/* Fields */}
@@ -141,8 +139,8 @@ const AdminProfile = () => {
               <input
                 type="email"
                 value={profile.email}
-                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                className="w-full bg-[#111827] border border-[#1e293b] rounded-lg px-4 py-3 text-[13px] text-white outline-none focus:border-[#25c3a3]/50 transition-colors"
+                readOnly
+                className="w-full bg-[#111827] border border-[#1e293b] rounded-lg px-4 py-3 text-[13px] text-white outline-none opacity-70 cursor-not-allowed"
               />
             </div>
           </div>

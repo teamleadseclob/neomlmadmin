@@ -87,7 +87,7 @@ const SecurityCredentials = () => {
 
       <div className="mt-5 flex items-center justify-between">
         <button className="text-[13px] text-[#25c3a3] hover:text-[#34d399] transition-colors cursor-pointer">
-          Force logout all other sessions?
+         
         </button>
         <button
           onClick={handleChangePassword}
