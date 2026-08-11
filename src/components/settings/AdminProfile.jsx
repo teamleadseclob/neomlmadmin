@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import {IoSearchOutline } from "react-icons/io5"
 import { HiOutlineUser } from "react-icons/hi"
 import { getAdminProfileApi, updateAdminProfileApi } from "../../api/authApi"
 
@@ -59,15 +58,8 @@ const AdminProfile = () => {
   return (
     <div>
       {/* Search Bar + Actions */}
-      <div className="flex items-center gap-3 mb-6 rounded-xl border border-[#1e293b] bg-[#0d1321] p-3">
-        <div className="flex items-center gap-2 flex-1 bg-[#111827] border border-[#1e293b] rounded-lg px-3 py-2.5">
-          <IoSearchOutline className="text-[#475569] text-lg" />
-          <input
-            type="text"
-            placeholder="Global search for members, IDs, or transactions..."
-            className="bg-transparent text-[13px] text-[#94a3b8] placeholder-[#475569] outline-none w-full"
-          />
-        </div>
+      <div className="flex items-center justify-end gap-3 mb-6 rounded-xl border border-[#1e293b] bg-[#0d1321] p-3">
+
         {msg && <span className={`text-[12px] ${msg === "Saved!" ? "text-[#25c3a3]" : "text-red-400"}`}>{msg}</span>}
         {!editing ? (
           <button
